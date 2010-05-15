@@ -1,5 +1,10 @@
 package moteur;
 
+import javax.media.opengl.GLCapabilities;
+
+import graphique.FenetrePrincipale;
+import graphique.ZoneDeJeu;
+
 public class ControleurJeu
 {
 	public static void main(String[] args)
@@ -25,5 +30,9 @@ public class ControleurJeu
 		plateau.rotation(Plateau.HORAIRE, piece);
 		System.out.println(plateau);
 		System.out.println(piece+"\n");
+		
+		GLCapabilities capabilities = new GLCapabilities();
+		capabilities.setDoubleBuffered(true);
+		new FenetrePrincipale("Puyo Puyo 2010", 500, 600, new ZoneDeJeu(capabilities, 400, 500));
 	}	
 }
