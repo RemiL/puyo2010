@@ -7,6 +7,8 @@ public class Plateau
 {
 	public static final int GAUCHE = -1;
 	public static final int DROITE = 1;
+	public static final int HORAIRE = 1;
+	public static final int ANTIHORAIRE = -1;
 	public static final int LARGEUR = 6;
 	public static final int HAUTEUR = 15;
 	
@@ -83,6 +85,41 @@ public class Plateau
 						piece.remove(tabPlateau[i][j]);
 				}
 			}
+		}
+	}
+	
+	public void rotation(int sens, Piece piece)
+	{
+		Point point, pointPivot = piece.getPointPivot();
+		Piece anciennePiece = (Piece) piece.clone();
+		boolean possible = true;
+		int i, j;
+		
+		for (Map.Entry<Puyo, Point> paire : piece.entrySet())
+		{
+			point = paire.getValue();
+			
+			if (!pointPivot.equals(point))
+			{
+				i = sens * (point.y - pointPivot.y) + pointPivot.x;
+				j = -sens * (point.x - pointPivot.x) + pointPivot.y;
+				
+				if ((i > 3 && i < HAUTEUR && j >= 0 && j < LARGEUR) && (tabPlateau[i][j] == null || piece.containsKey(tabPlateau[i][j])))
+				{
+					piece.get(paire.getKey()).setLocation(i, j);
+				}
+				else
+				{
+					possible = false;
+					piece = anciennePiece;
+					break;
+				}
+			}
+		}
+		
+		if (possible)
+		{
+			rafraichir(anciennePiece, piece);
 		}
 	}
 }
