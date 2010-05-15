@@ -123,15 +123,13 @@ public class Piece extends HashMap<Puyo, Point>
 		return anciennePiece;
 	}
 	
-	public void rotation(boolean horaire)
+	public Puyo getPivot()
 	{
-		if(horaire)
-		{
-			
-		}
-		else
-		{
-			
-		}
+		return pivot;
+	}
+	
+	public Point getPointPivot()
+	{
+		return this.get(pivot);
 	}
 }

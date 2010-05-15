@@ -15,9 +15,14 @@ public class ControleurJeu
 		System.out.println(plateau);
 		
 		plateau.translationHorizontale(Plateau.GAUCHE, piece);
+		plateau.translationHorizontale(Plateau.GAUCHE, piece);
 		System.out.println(plateau);
 		System.out.println(piece+"\n");
-		plateau.translationVerticale(piece);
+		plateau.translationVerticale(piece);plateau.translationVerticale(piece);
+		plateau.translationVerticale(piece);plateau.translationVerticale(piece);
+		System.out.println(plateau);
+		System.out.println(piece+"\n");
+		plateau.rotation(Plateau.HORAIRE, piece);
 		System.out.println(plateau);
 		System.out.println(piece+"\n");
 	}	
