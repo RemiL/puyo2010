@@ -1,6 +1,6 @@
 package graphique;
 
-import java.awt.Point;
+import java.awt.Color;
 
 import javax.media.opengl.DebugGL;
 import javax.media.opengl.GL;
@@ -10,6 +10,8 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 
+import moteur.Plateau;
+
 import com.sun.opengl.util.FPSAnimator;
 
 public class ZoneDeJeu extends GLCanvas implements GLEventListener
@@ -18,6 +20,9 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 	/** The GL unit (helper class). */
     private GLU glu;
     private FPSAnimator animator;
+    private Plateau plateau;
+    private boolean majNecessaire;
+    private int listePlateau;
 	
 	public ZoneDeJeu(GLCapabilities capabilities, int width, int height)
 	{
@@ -25,6 +30,8 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		this.setSize(width, height);
 		
 		this.addGLEventListener(this);
+		
+		majNecessaire = false;
 	}
 	
 	@Override
@@ -35,7 +42,9 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		drawable.setGL(new DebugGL(drawable.getGL()));
         final GL gl = drawable.getGL();
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
+        
+		listePlateau = gl.glGenLists(1); 
+        
         animator = new FPSAnimator(this, 60);
         animator.start();
 	}
@@ -57,7 +66,10 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 		
-		dessinerCercle(gl, new Point(getWidth()/2, getHeight()/2), 100);
+		if (majNecessaire)
+			faireListePlateau(gl);
+		
+		gl.glCallList(listePlateau);
 		
 		gl.glFlush();
 	}
@@ -69,17 +81,49 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 
 	}
 	
-	public void dessinerCercle(GL gl, Point c, double rayon)
+	public void dessinerCercle(GL gl, int cx, int cy, double rayon, Color couleur)
 	{
 		double x, y;
 		
-		gl.glBegin (GL.GL_POLYGON);       
+		gl.glColor3f(couleur.getRed()/255, couleur.getGreen()/255, couleur.getBlue()/255);
+		gl.glBegin(GL.GL_POLYGON);
 			for (double theta = 0; theta < 2*Math.PI; theta += Math.PI/100)
 			{
-				x = (c.x + (Math.sin(theta) * rayon));
-				y = (c.y + (Math.cos(theta) * rayon));
+				x = (cx + (Math.sin(theta) * rayon));
+				y = (cy + (Math.cos(theta) * rayon));
 			    gl.glVertex2d(x,y);
 			}
 		gl.glEnd();
+	}
+	
+	public void chargerPlateau(Plateau plateau)
+	{
+		this.plateau = plateau;
+		majNecessaire = true;
+	}
+	
+	public void faireListePlateau(GL gl)
+	{
+		majNecessaire = false;
+		int cx, cy = 400;
+		
+		gl.glNewList(listePlateau, GL.GL_COMPILE);
+			for (int i=3; i<Plateau.HAUTEUR; i++)
+			{
+				cx = 20;
+				
+				for (int j=0; j<Plateau.LARGEUR; j++)
+				{
+					if (!plateau.estLibre(i, j))
+					{
+						dessinerCercle(gl, cx, cy, 15, plateau.getCouleurPuyo(i, j));
+					}
+					
+					cx += 35;
+				}
+				
+				cy -= 35;
+			}
+		gl.glEndList();
 	}
 }

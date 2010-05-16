@@ -7,32 +7,37 @@ import graphique.ZoneDeJeu;
 
 public class ControleurJeu
 {
-	public static void main(String[] args)
+	public static void main(String[] args) throws InterruptedException
 	{
 		Plateau plateau = new Plateau();
 		Piece piece = new Piece();
 		
-		System.out.println(plateau);
-		System.out.println(piece+"\n");
+		GLCapabilities capabilities = new GLCapabilities();
+		capabilities.setDoubleBuffered(true);
+		// Antialiasing FSAA 4x
+		capabilities.setNumSamples(4);
+		capabilities.setSampleBuffers(true);
+		
+		ZoneDeJeu zdj = new ZoneDeJeu(capabilities, 400, 500);
+		new FenetrePrincipale("Puyo Puyo 2010", 500, 600, zdj);
 		
 		plateau.rafraichir(null, piece);
 		
-		System.out.println(plateau);
+		plateau.translationVerticale(piece);
+		plateau.translationVerticale(piece);
+		plateau.translationVerticale(piece);
+		zdj.chargerPlateau((Plateau) plateau.clone());
+		Thread.sleep(1000);
 		
-		plateau.translationHorizontale(Plateau.GAUCHE, piece);
-		plateau.translationHorizontale(Plateau.GAUCHE, piece);
-		System.out.println(plateau);
-		System.out.println(piece+"\n");
-		plateau.translationVerticale(piece);plateau.translationVerticale(piece);
-		plateau.translationVerticale(piece);plateau.translationVerticale(piece);
-		System.out.println(plateau);
-		System.out.println(piece+"\n");
+		plateau.translationHorizontale(Plateau.DROITE, piece);
+		zdj.chargerPlateau((Plateau) plateau.clone());
+		Thread.sleep(1000);
+		
 		plateau.rotation(Plateau.HORAIRE, piece);
-		System.out.println(plateau);
-		System.out.println(piece+"\n");
+		zdj.chargerPlateau((Plateau) plateau.clone());
+		Thread.sleep(1000);
 		
-		GLCapabilities capabilities = new GLCapabilities();
-		capabilities.setDoubleBuffered(true);
-		new FenetrePrincipale("Puyo Puyo 2010", 500, 600, new ZoneDeJeu(capabilities, 400, 500));
+		plateau.rotation(Plateau.HORAIRE, piece);
+		zdj.chargerPlateau((Plateau) plateau.clone());
 	}	
 }
