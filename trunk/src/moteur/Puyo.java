@@ -25,7 +25,7 @@ public class Puyo
 		this.couleur = couleur;
 	}
 	
-	public Color getColor()
+	public Color getCouleur()
 	{
 		return couleur;
 	}

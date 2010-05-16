@@ -1,9 +1,10 @@
 package moteur;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.util.Map;
 
-public class Plateau
+public class Plateau implements Cloneable
 {
 	public static final int GAUCHE = -1;
 	public static final int DROITE = 1;
@@ -34,6 +35,24 @@ public class Plateau
 		}
 		
 		return s.toString();
+	}
+	
+	protected Object clone()
+	{
+		Plateau clone = new Plateau();
+		clone.tabPlateau = this.tabPlateau.clone();
+		
+		return clone;
+	}
+	
+	public boolean estLibre(int i, int j)
+	{
+		return (tabPlateau[i][j] == null);
+	}
+	
+	public Color getCouleurPuyo(int i, int j)
+	{
+		return tabPlateau[i][j].getCouleur();
 	}
 	
 	public void rafraichir(Piece anciennePiece, Piece piece)
