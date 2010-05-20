@@ -72,6 +72,11 @@ public class Plateau implements Cloneable
 		}
 	}
 	
+	public void ajouter(Piece piece)
+	{
+		this.rafraichir(null, piece);
+	}
+	
 	public void translationHorizontale(int direction, Piece piece)
 	{
 		if(direction == GAUCHE)
@@ -86,7 +91,7 @@ public class Plateau implements Cloneable
 		}
 	}
 	
-	public void translationVerticale(Piece piece)
+	public boolean translationVerticale(Piece piece)
 	{
 		for (int i=piece.getMaxI(); i>=piece.getMinI(); i--)
 		{
@@ -105,6 +110,8 @@ public class Plateau implements Cloneable
 				}
 			}
 		}
+		
+		return !piece.isEmpty();
 	}
 	
 	public void rotation(int sens, Piece piece)
