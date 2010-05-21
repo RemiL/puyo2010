@@ -61,43 +61,46 @@ public class ControleurJeu extends KeyAdapter
 	
 	public void keyPressed(KeyEvent e)
 	{
-		switch (e.getKeyCode())
+		if (!partie.getPieceCourante().estCassee())
 		{
-			case KeyEvent.VK_LEFT: // flèche gauche
-				synchronized (partie.getPlateau())
-				{
-					partie.getPlateau().translationHorizontale(Plateau.GAUCHE, partie.getPieceCourante());
-					zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
-				}
-			break;
-			case KeyEvent.VK_RIGHT: // flèche droite
-				synchronized (partie.getPlateau())
-				{
-					partie.getPlateau().translationHorizontale(Plateau.DROITE, partie.getPieceCourante());
-					zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
-				}
-			break;
-			case KeyEvent.VK_DOWN: // flèche bas
-				synchronized (partie.getPlateau())
-				{
-					partie.getPlateau().rotation(Plateau.HORAIRE, partie.getPieceCourante());
-					zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
-				}
-			break;
-			case KeyEvent.VK_UP: // flèche haut
-				synchronized (partie.getPlateau())
-				{
-					partie.getPlateau().rotation(Plateau.ANTIHORAIRE, partie.getPieceCourante());
-					zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
-				}
-			break;
-			case KeyEvent.VK_SPACE: // espace
-				synchronized (partie.getPlateau())
-				{
-					partie.getPlateau().translationVerticale(partie.getPieceCourante());
-					zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
-				}
-			break;
+			switch (e.getKeyCode())
+			{
+				case KeyEvent.VK_LEFT: // flèche gauche
+					synchronized (partie.getPlateau())
+					{
+						partie.getPlateau().translationHorizontale(Plateau.GAUCHE, partie.getPieceCourante());
+						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+					}
+				break;
+				case KeyEvent.VK_RIGHT: // flèche droite
+					synchronized (partie.getPlateau())
+					{
+						partie.getPlateau().translationHorizontale(Plateau.DROITE, partie.getPieceCourante());
+						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+					}
+				break;
+				case KeyEvent.VK_DOWN: // flèche bas
+					synchronized (partie.getPlateau())
+					{
+						partie.getPlateau().rotation(Plateau.HORAIRE, partie.getPieceCourante());
+						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+					}
+				break;
+				case KeyEvent.VK_UP: // flèche haut
+					synchronized (partie.getPlateau())
+					{
+						partie.getPlateau().rotation(Plateau.ANTIHORAIRE, partie.getPieceCourante());
+						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+					}
+				break;
+				case KeyEvent.VK_SPACE: // espace
+					synchronized (partie.getPlateau())
+					{
+						partie.getPlateau().translationVerticale(partie.getPieceCourante());
+						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+					}
+				break;
+			}
 		}
 	}
 }

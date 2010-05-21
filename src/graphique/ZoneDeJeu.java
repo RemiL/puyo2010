@@ -11,6 +11,7 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 
 import moteur.Plateau;
+import moteur.Puyo;
 
 import com.sun.opengl.util.FPSAnimator;
 
@@ -117,6 +118,13 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 					if (!plateau.estLibre(i, j))
 					{
 						dessinerCercle(gl, cx, cy, 15, plateau.getCouleurPuyo(i, j));
+						if(plateau.getPuyo(i, j).getLien(Puyo.HAUT))
+						{
+							gl.glPushMatrix();
+								gl.glScaled(0.5, 1, 1);
+								dessinerCercle(gl, cx, cy+35/2, 15, plateau.getCouleurPuyo(i, j));
+							gl.glPopMatrix();
+						}
 					}
 					
 					cx += 35;
