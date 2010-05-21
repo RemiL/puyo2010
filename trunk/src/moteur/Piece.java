@@ -2,6 +2,7 @@ package moteur;
 
 import java.awt.Point;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class Piece extends HashMap<Puyo, Point>
@@ -57,6 +58,18 @@ public class Piece extends HashMap<Puyo, Point>
 		}
 		
 		return clone;
+	}
+	
+	public String toString()
+	{
+		StringBuilder str = new StringBuilder("Pièce :");
+		
+		for (Map.Entry<Puyo, Point> paire : this.entrySet())
+		{
+			str.append("\n - "+paire.getKey()+" : "+paire.getValue());
+		}
+		
+		return str.toString();
 	}
 	
 	public int getMinI()

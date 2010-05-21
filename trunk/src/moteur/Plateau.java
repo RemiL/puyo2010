@@ -137,7 +137,12 @@ public class Plateau implements Cloneable
 				else
 				{
 					possible = false;
-					piece = anciennePiece;
+					
+					for (Puyo puyo : piece.keySet())
+					{
+						piece.put(puyo, anciennePiece.get(puyo));
+					}
+					
 					break;
 				}
 			}
