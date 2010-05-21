@@ -12,12 +12,15 @@ public class Piece extends HashMap<Puyo, Point>
 	private static final int DOUBLE = 0;
 	private static final int TRIPLE = 1;
 	private static final int COUDE = 2;
+	private boolean cassee;
 	
 	private Puyo pivot;
 	
 	public Piece()
 	{
 		super();
+		
+		cassee = false;
 
 		int forme = rand.nextInt(COUDE+1);
 		
@@ -144,5 +147,15 @@ public class Piece extends HashMap<Puyo, Point>
 	public Point getPointPivot()
 	{
 		return this.get(pivot);
+	}
+	
+	public boolean estCassee()
+	{
+		return cassee;
+	}
+	
+	public void setCassee()
+	{
+		cassee = true;
 	}
 }
