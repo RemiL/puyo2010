@@ -23,7 +23,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
     private FPSAnimator animator;
     private Plateau plateau;
     private boolean majNecessaire;
-    private int listePlateau;
+    private int listePuyo, listePlateau;
 	
 	public ZoneDeJeu(GLCapabilities capabilities, int width, int height)
 	{
@@ -44,8 +44,13 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
         final GL gl = drawable.getGL();
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         
-		listePlateau = gl.glGenLists(1); 
-        
+		listePuyo = gl.glGenLists(2); 
+		listePlateau = listePuyo + 1;
+		
+		gl.glNewList(listePuyo, GL.GL_COMPILE);
+			dessinerCercle(gl, 0, 0, 15);
+		gl.glEndList();
+		
         animator = new FPSAnimator(this, 60);
         animator.start();
 	}
@@ -82,11 +87,10 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 
 	}
 	
-	public void dessinerCercle(GL gl, int cx, int cy, double rayon, Color couleur)
+	public void dessinerCercle(GL gl, int cx, int cy, double rayon)
 	{
 		double x, y;
 		
-		gl.glColor3f(couleur.getRed()/255, couleur.getGreen()/255, couleur.getBlue()/255);
 		gl.glBegin(GL.GL_POLYGON);
 			for (double theta = 0; theta < 2*Math.PI; theta += Math.PI/100)
 			{
@@ -106,6 +110,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 	public void faireListePlateau(GL gl)
 	{
 		majNecessaire = false;
+		Color couleur;
 		int cx, cy = 400;
 		
 		gl.glNewList(listePlateau, GL.GL_COMPILE);
@@ -117,14 +122,30 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 				{
 					if (!plateau.estLibre(i, j))
 					{
-						dessinerCercle(gl, cx, cy, 15, plateau.getCouleurPuyo(i, j));
-						if(plateau.getPuyo(i, j).getLien(Puyo.HAUT))
-						{
-							gl.glPushMatrix();
-								gl.glScaled(0.5, 1, 1);
-								dessinerCercle(gl, cx, cy+35/2, 15, plateau.getCouleurPuyo(i, j));
-							gl.glPopMatrix();
-						}
+						couleur = plateau.getCouleurPuyo(i, j);
+						
+						gl.glPushMatrix();
+							gl.glColor3f(couleur.getRed()/255, couleur.getGreen()/255, couleur.getBlue()/255);
+							gl.glTranslated(cx, cy, 0);
+							gl.glCallList(listePuyo);
+						
+							if(plateau.getPuyo(i, j).getLien(Puyo.HAUT))
+							{
+								gl.glPushMatrix();
+									gl.glTranslated(0, 35/2, 0);
+									gl.glScaled(0.5, 1, 1);
+									gl.glCallList(listePuyo);
+								gl.glPopMatrix();
+							}
+							if(plateau.getPuyo(i, j).getLien(Puyo.DROITE))
+							{
+								gl.glPushMatrix();
+									gl.glTranslated(35/2, 0, 0);
+									gl.glScaled(1, 0.6, 1);
+									gl.glCallList(listePuyo);
+								gl.glPopMatrix();
+							}
+						gl.glPopMatrix();
 					}
 					
 					cx += 35;
