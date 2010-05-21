@@ -114,7 +114,7 @@ public class Plateau implements Cloneable
 					{
 						piece.remove(tabPlateau[i][j]);
 						piece.setCassee();
-						creerLiens(i, j);
+						creerLiens(piece, i, j);
 					}
 				}
 			}
@@ -163,7 +163,7 @@ public class Plateau implements Cloneable
 		}
 	}
 	
-	private void creerLiens(int i, int j)
+	private void creerLiens(Piece piece, int i, int j)
 	{
 		if (i-1 > 3 && tabPlateau[i][j].equals(tabPlateau[i-1][j]))
 		{
@@ -173,11 +173,11 @@ public class Plateau implements Cloneable
 		{
 			tabPlateau[i+1][j].setLien(Puyo.HAUT);
 		}
-		if (j+1 < LARGEUR && tabPlateau[i][j].equals(tabPlateau[i][j+1]))
+		if (j+1 < LARGEUR && tabPlateau[i][j].equals(tabPlateau[i][j+1]) && !piece.containsKey(tabPlateau[i][j+1]))
 		{
 			tabPlateau[i][j].setLien(Puyo.DROITE);
 		}
-		if (j-1 > 0 && tabPlateau[i][j].equals(tabPlateau[i][j-1]))
+		if (j-1 >= 0 && tabPlateau[i][j].equals(tabPlateau[i][j-1]) && !piece.containsKey(tabPlateau[i][j-1]))
 		{
 			tabPlateau[i][j-1].setLien(Puyo.DROITE);
 		}
