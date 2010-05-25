@@ -1,6 +1,9 @@
 package graphique;
 
+import graphique.texture.TextureReader;
+
 import java.awt.Color;
+import java.io.IOException;
 
 import javax.media.opengl.DebugGL;
 import javax.media.opengl.GL;
@@ -9,6 +12,7 @@ import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
+
 
 import moteur.Plateau;
 import moteur.Puyo;
@@ -24,6 +28,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
     private Plateau plateau;
     private boolean majNecessaire;
     private int listePuyo, listePlateau;
+    private int texture;
 	
 	public ZoneDeJeu(GLCapabilities capabilities, int width, int height)
 	{
@@ -53,6 +58,20 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		
         animator = new FPSAnimator(this, 60);
         animator.start();
+        
+        gl.glEnable(GL.GL_TEXTURE_2D);
+        texture = genTexture(gl);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, texture);
+        TextureReader.Texture texture = null;
+        try {
+            texture = TextureReader.readTexture("resources/fond.png");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        makeRGBTexture(gl, glu, texture, GL.GL_TEXTURE_2D, false);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
 	}
 	
 	@Override
@@ -70,7 +89,21 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 	{
 		final GL gl = drawable.getGL();
 		
-		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+		gl.glBindTexture(GL.GL_TEXTURE_2D, texture);
+		
+		// Fond
+		gl.glBegin(GL.GL_QUADS);
+			gl.glColor3f(1, 1, 1);
+	        gl.glTexCoord2f(0.0f, 0.0f);
+	        gl.glVertex3f(0.0f, 0.0f, -1.0f);
+	        gl.glTexCoord2f(1.0f, 0.0f);
+	        gl.glVertex3f(800.0f, 0.0f, -1.0f);
+	        gl.glTexCoord2f(1.0f, 1.0f);
+	        gl.glVertex3f(800.0f, 600.0f, -1.0f);
+	        gl.glTexCoord2f(0.0f, 1.0f);
+	        gl.glVertex3f(0.0f, 600.0f, -1.0f);
+	    gl.glEnd();
 		
 		if (majNecessaire)
 			faireListePlateau(gl);
@@ -114,45 +147,66 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		int cx, cy = 400;
 		
 		gl.glNewList(listePlateau, GL.GL_COMPILE);
-			for (int i=3; i<Plateau.HAUTEUR; i++)
-			{
-				cx = 20;
-				
-				for (int j=0; j<Plateau.LARGEUR; j++)
+			gl.glPushMatrix();
+				gl.glTranslatef(292, 0, 0);
+				for (int i=3; i<Plateau.HAUTEUR; i++)
 				{
-					if (!plateau.estLibre(i, j))
+					cx = 20;
+					
+					for (int j=0; j<Plateau.LARGEUR; j++)
 					{
-						couleur = plateau.getCouleurPuyo(i, j);
+						if (!plateau.estLibre(i, j))
+						{
+							couleur = plateau.getCouleurPuyo(i, j);
+							
+							gl.glPushMatrix();
+								gl.glColor3f(couleur.getRed()/255, couleur.getGreen()/255, couleur.getBlue()/255);
+								gl.glTranslated(cx, cy, 0);
+								gl.glCallList(listePuyo);
+							
+								if(plateau.getPuyo(i, j).getLien(Puyo.HAUT))
+								{
+									gl.glPushMatrix();
+										gl.glTranslated(0, 35/2, 0);
+										gl.glScaled(0.5, 1, 1);
+										gl.glCallList(listePuyo);
+									gl.glPopMatrix();
+								}
+								if(plateau.getPuyo(i, j).getLien(Puyo.DROITE))
+								{
+									gl.glPushMatrix();
+										gl.glTranslated(35/2, 0, 0);
+										gl.glScaled(1, 0.6, 1);
+										gl.glCallList(listePuyo);
+									gl.glPopMatrix();
+								}
+							gl.glPopMatrix();
+						}
 						
-						gl.glPushMatrix();
-							gl.glColor3f(couleur.getRed()/255, couleur.getGreen()/255, couleur.getBlue()/255);
-							gl.glTranslated(cx, cy, 0);
-							gl.glCallList(listePuyo);
-						
-							if(plateau.getPuyo(i, j).getLien(Puyo.HAUT))
-							{
-								gl.glPushMatrix();
-									gl.glTranslated(0, 35/2, 0);
-									gl.glScaled(0.5, 1, 1);
-									gl.glCallList(listePuyo);
-								gl.glPopMatrix();
-							}
-							if(plateau.getPuyo(i, j).getLien(Puyo.DROITE))
-							{
-								gl.glPushMatrix();
-									gl.glTranslated(35/2, 0, 0);
-									gl.glScaled(1, 0.6, 1);
-									gl.glCallList(listePuyo);
-								gl.glPopMatrix();
-							}
-						gl.glPopMatrix();
+						cx += 35;
 					}
 					
-					cx += 35;
+					cy -= 35;
 				}
-				
-				cy -= 35;
-			}
+			gl.glPopMatrix();
 		gl.glEndList();
 	}
+	
+	private void makeRGBTexture(GL gl, GLU glu, TextureReader.Texture img, 
+            int target, boolean mipmapped) {
+        
+        if (mipmapped) {
+            glu.gluBuild2DMipmaps(target, GL.GL_RGB8, img.getWidth(), 
+                    img.getHeight(), GL.GL_RGB, GL.GL_UNSIGNED_BYTE, img.getPixels());
+        } else {
+            gl.glTexImage2D(target, 0, GL.GL_RGB, img.getWidth(), 
+                    img.getHeight(), 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, img.getPixels());
+        }
+    }
+
+    private int genTexture(GL gl) {
+        final int[] tmp = new int[1];
+        gl.glGenTextures(1, tmp, 0);
+        return tmp[0];
+    }
 }

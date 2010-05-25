@@ -44,8 +44,8 @@ public class ControleurJeu extends KeyAdapter
 		capabilities.setNumSamples(4);
 		capabilities.setSampleBuffers(true);
 		
-		zoneDeJeu = new ZoneDeJeu(capabilities, 400, 500);
-		fenetrePrincipale = new FenetrePrincipale("Puyo Puyo 2010", 500, 600, zoneDeJeu);
+		zoneDeJeu = new ZoneDeJeu(capabilities, 800, 600);
+		fenetrePrincipale = new FenetrePrincipale("Puyo Puyo 2010", 800, 628, zoneDeJeu);
 		zoneDeJeu.addKeyListener(this);
 		
 		partie = new Partie();
