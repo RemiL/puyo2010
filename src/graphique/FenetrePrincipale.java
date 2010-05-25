@@ -18,6 +18,7 @@ public class FenetrePrincipale extends JFrame
 		pane.setLayout(new BorderLayout());
 		pane.add(zdj, BorderLayout.CENTER);
 		
+		this.setResizable(false);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
 		
