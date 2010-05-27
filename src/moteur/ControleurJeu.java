@@ -29,7 +29,7 @@ public class ControleurJeu extends KeyAdapter
 			synchronized (partie.getPlateau())
 			{
 				if (!partie.getPlateau().translationVerticale(partie.getPieceCourante()))
-					partie.chargerPieceSuivante();
+					zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante());
 				zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
 			}
 		}
@@ -49,6 +49,7 @@ public class ControleurJeu extends KeyAdapter
 		zoneDeJeu.addKeyListener(this);
 		
 		partie = new Partie();
+		zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante());
 		
 		timerChute = new Timer();
 		timerChute.schedule(new TimerChute(), 500, 500);

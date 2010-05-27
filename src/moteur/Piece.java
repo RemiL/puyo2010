@@ -9,9 +9,10 @@ public class Piece extends HashMap<Puyo, Point>
 {
 	private static final long serialVersionUID = -6304397420328786766L;
 	private static Random rand = new Random();
-	private static final int DOUBLE = 0;
-	private static final int TRIPLE = 1;
-	private static final int COUDE = 2;
+	public static final int DOUBLE = 0;
+	public static final int TRIPLE = 1;
+	public static final int COUDE = 2;
+	private int forme;
 	private boolean cassee;
 	
 	private Puyo pivot;
@@ -22,7 +23,7 @@ public class Piece extends HashMap<Puyo, Point>
 		
 		cassee = false;
 
-		int forme = rand.nextInt(COUDE+1);
+		forme = rand.nextInt(COUDE+1);
 		
 		switch(forme)
 		{
@@ -73,6 +74,11 @@ public class Piece extends HashMap<Puyo, Point>
 		}
 		
 		return str.toString();
+	}
+	
+	public int getForme()
+	{
+		return forme;
 	}
 	
 	public int getMinI()

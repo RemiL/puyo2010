@@ -3,7 +3,9 @@ package graphique;
 import graphique.texture.TextureReader;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.media.opengl.DebugGL;
 import javax.media.opengl.GL;
@@ -14,6 +16,7 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 
 
+import moteur.Piece;
 import moteur.Plateau;
 import moteur.Puyo;
 
@@ -26,8 +29,9 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
     private GLU glu;
     private FPSAnimator animator;
     private Plateau plateau;
-    private boolean majNecessaire;
-    private int listePuyo, listePlateau;
+    private Piece[] piecesSuivantes;
+    private boolean majNecessairePlateau, majNecessairePiecesSuivantes;
+    private int listePuyo, listePlateau, listePiecesSuivantes;
     private int texture;
 	
 	public ZoneDeJeu(GLCapabilities capabilities, int width, int height)
@@ -37,7 +41,8 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		
 		this.addGLEventListener(this);
 		
-		majNecessaire = false;
+		majNecessairePlateau = false;
+		majNecessairePiecesSuivantes = false;
 	}
 	
 	@Override
@@ -49,8 +54,9 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
         final GL gl = drawable.getGL();
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         
-		listePuyo = gl.glGenLists(2); 
+		listePuyo = gl.glGenLists(3); 
 		listePlateau = listePuyo + 1;
+		listePiecesSuivantes = listePlateau + 1;
 		
 		gl.glNewList(listePuyo, GL.GL_COMPILE);
 			dessinerCercle(gl, 0, 0, 15);
@@ -105,9 +111,12 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 	        gl.glVertex3f(0.0f, 600.0f, -1.0f);
 	    gl.glEnd();
 		
-		if (majNecessaire)
+		if (majNecessairePlateau)
 			faireListePlateau(gl);
+		if (majNecessairePiecesSuivantes)
+			faireListePiecesSuivantes(gl);
 		
+		gl.glCallList(listePiecesSuivantes);
 		gl.glCallList(listePlateau);
 		
 		gl.glFlush();
@@ -137,18 +146,18 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 	public void chargerPlateau(Plateau plateau)
 	{
 		this.plateau = plateau;
-		majNecessaire = true;
+		majNecessairePlateau = true;
 	}
 	
 	public void faireListePlateau(GL gl)
 	{
-		majNecessaire = false;
+		majNecessairePlateau = false;
 		Color couleur;
 		int cx, cy = 400;
 		
 		gl.glNewList(listePlateau, GL.GL_COMPILE);
 			gl.glPushMatrix();
-				gl.glTranslatef(292, 0, 0);
+				gl.glTranslatef(292, 3, 0);
 				for (int i=3; i<Plateau.HAUTEUR; i++)
 				{
 					cx = 20;
@@ -190,6 +199,47 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 				}
 			gl.glPopMatrix();
 		gl.glEndList();
+	}
+	
+	public void chargerPiecesSuivantes(Piece[] piecesSuivantes)
+	{
+		this.piecesSuivantes = piecesSuivantes;
+		majNecessairePiecesSuivantes = true;
+	}
+	
+	public void faireListePiecesSuivantes(GL gl)
+	{
+		majNecessairePiecesSuivantes = false;
+		Color couleur;
+		Point position;
+		//int cx, cy = 400;
+		
+		gl.glNewList(listePiecesSuivantes, GL.GL_COMPILE);
+			gl.glPushMatrix();
+				gl.glTranslated(592, 467, 0);
+				
+				for (Piece piece : piecesSuivantes)
+				{
+					gl.glPushMatrix();
+						if (piece.getForme() != Piece.COUDE)
+							gl.glTranslated(18, 0, 0);
+						for (Map.Entry<Puyo, Point> paire : piece.entrySet())
+						{
+							couleur = paire.getKey().getCouleur();
+							position = paire.getValue();
+							
+							gl.glPushMatrix();
+								gl.glColor3f(couleur.getRed()/255, couleur.getGreen()/255, couleur.getBlue()/255);
+								gl.glTranslated((position.y - 2) * 35, (2 - position.x) * 35, 0);
+								gl.glCallList(listePuyo);
+							gl.glPopMatrix();
+						}
+					gl.glPopMatrix();
+					gl.glTranslated(100, 0, 0);
+				}
+			gl.glPopMatrix();
+		gl.glEndList();
+			
 	}
 	
 	private void makeRGBTexture(GL gl, GLU glu, TextureReader.Texture img, 
