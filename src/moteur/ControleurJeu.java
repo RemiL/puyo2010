@@ -16,7 +16,7 @@ public class ControleurJeu extends KeyAdapter
 	private FenetrePrincipale fenetrePrincipale;
 	private ZoneDeJeu zoneDeJeu;
 	private Timer timerChute;
-	
+		
 	private class TimerChute extends TimerTask
 	{
 		public TimerChute()
@@ -49,10 +49,7 @@ public class ControleurJeu extends KeyAdapter
 		zoneDeJeu.addKeyListener(this);
 		
 		partie = new Partie();
-		zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante());
-		
-		timerChute = new Timer();
-		timerChute.schedule(new TimerChute(), 500, 500);
+		zoneDeJeu.chargerPiecesSuivantes(partie.getPiecesSuivantes());
 	}
 	
 	public static void main(String[] args)
@@ -62,7 +59,29 @@ public class ControleurJeu extends KeyAdapter
 	
 	public void keyPressed(KeyEvent e)
 	{
-		if (!partie.getPieceCourante().estCassee())
+		if (!partie.estEnCours())
+		{
+			if (e.getKeyCode() == KeyEvent.VK_ENTER)
+			{
+				partie.commencerPartie();
+				zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante());
+				
+				timerChute = new Timer();
+				timerChute.schedule(new TimerChute(), 500, 500);
+			}
+		}
+		else if (partie.estEnPause() && e.getKeyCode() == KeyEvent.VK_PAUSE)
+		{
+			timerChute = new Timer();
+			timerChute.schedule(new TimerChute(), 0, 500);
+			partie.reprendrePartie();
+		}
+		else if (!partie.estEnPause() && e.getKeyCode() == KeyEvent.VK_PAUSE)
+		{
+			timerChute.cancel();
+			partie.mettreEnPause();
+		}
+		else if (!partie.estEnPause() && !partie.getPieceCourante().estCassee())
 		{
 			switch (e.getKeyCode())
 			{
