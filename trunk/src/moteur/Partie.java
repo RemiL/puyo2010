@@ -10,6 +10,7 @@ public class Partie
 	private int score;
 	private int difficulte;
 	private int combo;
+	private boolean start, pause;
 	
 	public Partie()
 	{
@@ -18,6 +19,8 @@ public class Partie
 		score = 0;
 		difficulte = 0;
 		combo = 0;
+		start = false;
+		pause = false;
 		
 		prochainesPieces.add(new Piece());
 		prochainesPieces.add(new Piece());
@@ -40,5 +43,35 @@ public class Partie
 		prochainesPieces.add(new Piece());
 		
 		return prochainesPieces.toArray(new Piece[2]);
+	}
+	
+	public Piece[] getPiecesSuivantes()
+	{
+		return prochainesPieces.toArray(new Piece[2]);
+	}
+	
+	public void commencerPartie()
+	{
+		start = true;
+	}
+	
+	public boolean estEnCours()
+	{
+		return start;
+	}
+	
+	public void mettreEnPause()
+	{
+		pause = true;
+	}
+	
+	public void reprendrePartie()
+	{
+		pause = false;
+	}
+	
+	public boolean estEnPause()
+	{
+		return pause;
 	}
 }
