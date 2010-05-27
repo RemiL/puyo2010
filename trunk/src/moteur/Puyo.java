@@ -7,10 +7,10 @@ public class Puyo
 {
 	private static final Color[] couleurs = 
 	{
-		Color.CYAN,
+		Color.MAGENTA,
 		Color.RED,
 		Color.GREEN,
-		Color.MAGENTA
+		Color.BLACK
 	};
 	private Color couleur;
 	private static Random rand = new Random();

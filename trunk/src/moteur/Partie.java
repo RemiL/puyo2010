@@ -19,9 +19,6 @@ public class Partie
 		difficulte = 0;
 		combo = 0;
 		
-		pieceCourante = new Piece();
-		plateau.ajouter(pieceCourante);
-		
 		prochainesPieces.add(new Piece());
 		prochainesPieces.add(new Piece());
 	}
@@ -36,10 +33,12 @@ public class Partie
 		return pieceCourante;
 	}
 
-	public void chargerPieceSuivante()
+	public Piece[] chargerPieceSuivante()
 	{
 		pieceCourante = prochainesPieces.poll();
 		plateau.ajouter(pieceCourante);
 		prochainesPieces.add(new Piece());
+		
+		return prochainesPieces.toArray(new Piece[2]);
 	}
 }
