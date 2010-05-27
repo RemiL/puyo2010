@@ -84,15 +84,18 @@ public class Plateau implements Cloneable
 	
 	public void translationHorizontale(int direction, Piece piece)
 	{
-		if(direction == GAUCHE)
+		if (piece.getMaxI() > 2)
 		{
-			if(piece.getMinJ() > 0 && tabPlateau[piece.getMaxI()][piece.getMinJ()-1] == null)
-				rafraichir(piece.translationHorizontale(direction), piece);
-		}
-		else
-		{
-			if(piece.getMaxJ() < LARGEUR-1 && tabPlateau[piece.getMaxI()][piece.getMaxJ()+1] == null)
-				rafraichir(piece.translationHorizontale(direction), piece);
+			if(direction == GAUCHE)
+			{
+				if(piece.getMinJ() > 0 && tabPlateau[piece.getMaxI()][piece.getMinJ()-1] == null)
+					rafraichir(piece.translationHorizontale(direction), piece);
+			}
+			else
+			{
+				if(piece.getMaxJ() < LARGEUR-1 && tabPlateau[piece.getMaxI()][piece.getMaxJ()+1] == null)
+					rafraichir(piece.translationHorizontale(direction), piece);
+			}
 		}
 	}
 	
