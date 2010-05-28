@@ -62,9 +62,6 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 			dessinerCercle(gl, 0, 0, 15);
 		gl.glEndList();
 		
-        animator = new FPSAnimator(this, 60);
-        animator.start();
-        
         gl.glEnable(GL.GL_TEXTURE_2D);
         texture = genTexture(gl);
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture);
@@ -78,6 +75,9 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
         makeRGBTexture(gl, glu, texture, GL.GL_TEXTURE_2D, false);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+        
+        animator = new FPSAnimator(this, 60);
+        animator.start();
 	}
 	
 	@Override
@@ -101,14 +101,14 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		// Fond
 		gl.glBegin(GL.GL_QUADS);
 			gl.glColor3f(1, 1, 1);
-	        gl.glTexCoord2f(0.0f, 0.0f);
-	        gl.glVertex3f(0.0f, 0.0f, -1.0f);
-	        gl.glTexCoord2f(1.0f, 0.0f);
-	        gl.glVertex3f(800.0f, 0.0f, -1.0f);
-	        gl.glTexCoord2f(1.0f, 1.0f);
-	        gl.glVertex3f(800.0f, 600.0f, -1.0f);
-	        gl.glTexCoord2f(0.0f, 1.0f);
-	        gl.glVertex3f(0.0f, 600.0f, -1.0f);
+	        gl.glTexCoord2i(0, 0);
+	        gl.glVertex2i(0, 0);
+	        gl.glTexCoord2i(1, 0);
+	        gl.glVertex2i(800, 0);
+	        gl.glTexCoord2i(1, 1);
+	        gl.glVertex2i(800, 600);
+	        gl.glTexCoord2i(0, 1);
+	        gl.glVertex2i(0, 600);
 	    gl.glEnd();
 		
 		if (majNecessairePlateau)
