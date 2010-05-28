@@ -168,21 +168,24 @@ public class Plateau implements Cloneable
 	
 	private void creerLiens(Piece piece, int i, int j)
 	{
-		if (i-1 > 3 && tabPlateau[i][j].equals(tabPlateau[i-1][j]))
+		if (i > 2)
 		{
-			tabPlateau[i][j].setLien(Puyo.HAUT);
-		}
-		if (i+1 < HAUTEUR && tabPlateau[i][j].equals(tabPlateau[i+1][j]))
-		{
-			tabPlateau[i+1][j].setLien(Puyo.HAUT);
-		}
-		if (j+1 < LARGEUR && tabPlateau[i][j].equals(tabPlateau[i][j+1]) && !piece.containsKey(tabPlateau[i][j+1]))
-		{
-			tabPlateau[i][j].setLien(Puyo.DROITE);
-		}
-		if (j-1 >= 0 && tabPlateau[i][j].equals(tabPlateau[i][j-1]) && !piece.containsKey(tabPlateau[i][j-1]))
-		{
-			tabPlateau[i][j-1].setLien(Puyo.DROITE);
+			if (i-1 > 3 && tabPlateau[i][j].equals(tabPlateau[i-1][j]))
+			{
+				tabPlateau[i][j].setLien(Puyo.HAUT);
+			}
+			if (i+1 < HAUTEUR && tabPlateau[i][j].equals(tabPlateau[i+1][j]))
+			{
+				tabPlateau[i+1][j].setLien(Puyo.HAUT);
+			}
+			if (j+1 < LARGEUR && tabPlateau[i][j].equals(tabPlateau[i][j+1]) && !piece.containsKey(tabPlateau[i][j+1]))
+			{
+				tabPlateau[i][j].setLien(Puyo.DROITE);
+			}
+			if (j-1 >= 0 && tabPlateau[i][j].equals(tabPlateau[i][j-1]) && !piece.containsKey(tabPlateau[i][j-1]))
+			{
+				tabPlateau[i][j-1].setLien(Puyo.DROITE);
+			}
 		}
 	}
 }
