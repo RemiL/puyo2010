@@ -22,18 +22,44 @@ import moteur.Puyo;
 
 import com.sun.opengl.util.FPSAnimator;
 
+/**
+ * Classe dérivant d'un GLCanvas et implémentant l'interface GLEventListener
+ * permettant de créer la représentation graphique de la zone de jeu en utilisant
+ * OpenGL via JOGL pour l'affichage.
+ * @author Rémi Lacroix & Marie Nivet & Nicolas Poirier
+ *
+ */
 public class ZoneDeJeu extends GLCanvas implements GLEventListener
 {
 	private static final long serialVersionUID = 2421808737959876690L;
 	/** The GL unit (helper class). */
     private GLU glu;
+    /** Permet d'effectuer la boucle principale d'affichage */
     private FPSAnimator animator;
+    /** Le plateau actuellement affiché */
     private Plateau plateau;
+    /** Les deux prochaines pièces */
     private Piece[] piecesSuivantes;
-    private boolean majNecessairePlateau, majNecessairePiecesSuivantes;
-    private int listePuyo, listePlateau, listePiecesSuivantes;
+    /** Indique si une mise à jour du plateau est nécessaire */
+    private boolean majNecessairePlateau;
+    /** Indique si une mise à jour de l'affichage des pièces suivantes est nécessaire */
+    private boolean majNecessairePiecesSuivantes;
+    /** La display-list correspondant à un puyo */
+    private int listePuyo;
+    /** La display-list correspondant au plateau dans son ensemble */
+    private int listePlateau;
+    /** La display-list correspondant à l'affichage des pièces suivantes */
+    private int listePiecesSuivantes;
+    /** La texture permettant d'afficher l'image de fond */
     private int texture;
 	
+    /**
+     * Crée une nouvelle zone de jeu de taille width sur height pixels utilisant
+     * les capacités graphiques fournies.
+     * @param capabilities les capacités graphiques à utiliser.
+     * @param width largueur de la zone de jeu.
+     * @param height hauteur de la zone de jeu.
+     */
 	public ZoneDeJeu(GLCapabilities capabilities, int width, int height)
 	{
 		super(capabilities);
@@ -45,7 +71,12 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		majNecessairePiecesSuivantes = false;
 	}
 	
-	@Override
+	/**
+	 * Méthode appelée après l'initialisation du contexte OpenGL.
+	 * Met en place les différentes display-lists nécessaires,
+	 * charge la texture de fond et lance la boucle principale
+	 * de l'affichage.
+	 */
 	public void init(GLAutoDrawable drawable)
 	{
 		glu = new GLU();
@@ -54,6 +85,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
         final GL gl = drawable.getGL();
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         
+        // Display lists
 		listePuyo = gl.glGenLists(3); 
 		listePlateau = listePuyo + 1;
 		listePiecesSuivantes = listePlateau + 1;
@@ -62,6 +94,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 			dessinerCercle(gl, 0, 0, 15);
 		gl.glEndList();
 		
+		// Chargement de la texture de fond.
         gl.glEnable(GL.GL_TEXTURE_2D);
         texture = genTexture(gl);
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture);
@@ -76,11 +109,15 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
         
+        // Boucle principale d'affichage
         animator = new FPSAnimator(this, 60);
         animator.start();
 	}
 	
-	@Override
+	/**
+	 * Méthode appelée après que la zone d'affichage ait été redimensionnée,
+	 * maintient un affichage cohérent après le redimensionnement.
+	 */
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height)
 	{
 		final GL gl = drawable.getGL();
@@ -90,7 +127,9 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
         glu.gluOrtho2D(0.0, width, 0.0, height); 
 	}
 	
-	@Override
+	/**
+	 * Méthode appelée par la boucle d'affichage.
+	 */
 	public void display(GLAutoDrawable drawable)
 	{
 		final GL gl = drawable.getGL();
@@ -111,24 +150,33 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 	        gl.glVertex2i(0, 600);
 	    gl.glEnd();
 		
-		if (majNecessairePlateau)
-			faireListePlateau(gl);
-		if (majNecessairePiecesSuivantes)
-			faireListePiecesSuivantes(gl);
+		if (majNecessairePlateau) // Si la mise à jour est nécessaire
+			faireListePlateau(gl); // on reconstruit la display-list du plateau
+		if (majNecessairePiecesSuivantes) // Si la mise à jour est nécessaire
+			faireListePiecesSuivantes(gl); // on reconstruit la display-list de l'affichage des pièces suivantes
 		
+		// On affiche les pièces suivantes et le plateau
 		gl.glCallList(listePiecesSuivantes);
 		gl.glCallList(listePlateau);
 		
 		gl.glFlush();
 	}
 	
-	@Override
+	/**
+	 * Non utilisée.
+	 */
 	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged)
 	{
-		// TODO Auto-generated method stub
 
 	}
 	
+	/**
+	 * Dessine un cercle de centre de coordonnées (cx, cy) et de rayon rayon.
+	 * @param gl le contexte OpenGL.
+	 * @param cx coordonnée du centre sur l'axe des x.
+	 * @param cy coordonnée du centre sur l'axe des y.
+	 * @param rayon rayon du cercle.
+	 */
 	public void dessinerCercle(GL gl, int cx, int cy, double rayon)
 	{
 		double x, y;
@@ -143,13 +191,23 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		gl.glEnd();
 	}
 	
+	/**
+	 * Charge un plateau et indique que l'affichage du plateau
+	 * nécessite une mise à jour.
+	 * @param plateau le plateau à charger.
+	 */
 	public void chargerPlateau(Plateau plateau)
 	{
 		this.plateau = plateau;
 		majNecessairePlateau = true;
 	}
 	
-	public void faireListePlateau(GL gl)
+	/**
+	 * Crée une display-list correspondant au plateau actuellement stocké
+	 * et indique que l'affichage du plateau n'a plus besoin d'être redessiné.
+	 * @param gl le contexte OpenGL.
+	 */
+	private void faireListePlateau(GL gl)
 	{
 		majNecessairePlateau = false;
 		Color couleur;
@@ -201,13 +259,24 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		gl.glEndList();
 	}
 	
+	/**
+	 * Charge les deux prochaines pièces et indique que l'affichage des pièces
+	 * suivantes nécessite une mise à jour.
+	 * @param piecesSuivantes le tableau contenant les pièces suivantes.
+	 */
 	public void chargerPiecesSuivantes(Piece[] piecesSuivantes)
 	{
 		this.piecesSuivantes = piecesSuivantes;
 		majNecessairePiecesSuivantes = true;
 	}
 	
-	public void faireListePiecesSuivantes(GL gl)
+	/**
+	 * Crée une display-list correspondant aux pièces suivantes actuellement
+	 * stockées et indique que l'affichage des pièces suivantes n'a plus 
+	 * besoin d'être redessiné.
+	 * @param gl le contexte OpenGL.
+	 */
+	private void faireListePiecesSuivantes(GL gl)
 	{
 		majNecessairePiecesSuivantes = false;
 		Color couleur;
@@ -242,19 +311,18 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 			
 	}
 	
-	private void makeRGBTexture(GL gl, GLU glu, TextureReader.Texture img, 
-            int target, boolean mipmapped) {
-        
-        if (mipmapped) {
+	private void makeRGBTexture(GL gl, GLU glu, TextureReader.Texture img, int target, boolean mipmapped)
+	{
+        if (mipmapped)
             glu.gluBuild2DMipmaps(target, GL.GL_RGB8, img.getWidth(), 
-                    img.getHeight(), GL.GL_RGB, GL.GL_UNSIGNED_BYTE, img.getPixels());
-        } else {
+                    			  img.getHeight(), GL.GL_RGB, GL.GL_UNSIGNED_BYTE, img.getPixels());
+        else
             gl.glTexImage2D(target, 0, GL.GL_RGB, img.getWidth(), 
-                    img.getHeight(), 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, img.getPixels());
-        }
+                    		img.getHeight(), 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, img.getPixels());
     }
 
-    private int genTexture(GL gl) {
+    private int genTexture(GL gl)
+    {
         final int[] tmp = new int[1];
         gl.glGenTextures(1, tmp, 0);
         return tmp[0];

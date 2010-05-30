@@ -5,6 +5,11 @@ import java.awt.Container;
 
 import javax.swing.JFrame;
 
+/**
+ * Classe dérivant d'une JFrame et représentant la fenêtre principale de l'application.
+ * @author Rémi Lacroix & Marie Nivet & Nicolas Poirier
+ *
+ */
 public class FenetrePrincipale extends JFrame
 {
 	private static final long serialVersionUID = 4690329553231316904L;

@@ -10,13 +10,32 @@ import javax.media.opengl.GLCapabilities;
 import graphique.FenetrePrincipale;
 import graphique.ZoneDeJeu;
 
+/**
+ * Classe implémentant le contrôleur du jeu. Cette classe permet de maintenir
+ * la cohérence entre l'état de la partie et l'affichage graphique correspondant.
+ * Elle sert également à traiter les actions utilisateur en écoutant les événements
+ * claviers et à effectuer la boucle principale du jeu qui consiste à faire tomber
+ * la pièce.
+ * @author Rémi Lacroix & Marie Nivet & Nicolas Poirier
+ *
+ */
 public class ControleurJeu extends KeyAdapter
 {
+	/** La partie en cours */
 	private Partie partie;
+	/** La fenêtre principale du jeu */
 	private FenetrePrincipale fenetrePrincipale;
+	/** La zone de jeu */
 	private ZoneDeJeu zoneDeJeu;
+	/** Le timer permettant de gérer la chute des pièces dans le plateau */
 	private Timer timerChute;
-		
+	
+	/**
+	 * Classe implémentant l'action du timer, c'est à dire la chute
+	 * des pièces. Cette classe est utilisée par le timer.
+	 * @author Rémi Lacroix & Marie Nivet & Nicolas Poirier
+	 *
+	 */
 	private class TimerChute extends TimerTask
 	{
 		public TimerChute()
@@ -24,18 +43,27 @@ public class ControleurJeu extends KeyAdapter
 			super();
 		}
 		
+		/**
+		 * Méthode lançée par le timer après chaque période d'attente
+		 * pour faire descendre la pièce d'une case.
+		 */
 		public void run()
 		{
-			synchronized (partie.getPlateau())
+			synchronized (partie.getPlateau()) // On verrouille le plateau pour être sûr de ne pas avoir d'accès concurrent.
 			{
-				if (!partie.getPlateau().translationVerticale(partie.getPieceCourante()))
-					zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante());
-				zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+				if (!partie.getPlateau().translationVerticale(partie.getPieceCourante())) // Si la pièce ne peut plus descendre
+					zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante()); // On charge la suivante
+				zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone()); // On met à jour l'affichage
 			}
 		}
 		
 	}
 	
+	/**
+	 * Crée un nouveau contrôleur de jeu qui met en place
+	 * une interface graphique et la partie correspondante
+	 * et qui écoute les événements claviers.
+	 */
 	public ControleurJeu()
 	{
 		GLCapabilities capabilities = new GLCapabilities();
@@ -52,16 +80,24 @@ public class ControleurJeu extends KeyAdapter
 		zoneDeJeu.chargerPiecesSuivantes(partie.getPiecesSuivantes());
 	}
 	
+	/**
+	 * Méthode principale, crée un nouveau contrôleur de jeu.
+	 * @param args
+	 */
 	public static void main(String[] args)
 	{
 		ControleurJeu jeu = new ControleurJeu();
 	}
 	
+	/**
+	 * Méthode appellée lorsque l'utilisateur presse une touche, permet
+	 * d'effectuer l'action correspondant à l'appui de l'utilisateur.
+	 */
 	public void keyPressed(KeyEvent e)
 	{
 		if (!partie.estEnCours())
 		{
-			if (e.getKeyCode() == KeyEvent.VK_ENTER)
+			if (e.getKeyCode() == KeyEvent.VK_ENTER) // Lancement de la partie
 			{
 				partie.commencerPartie();
 				zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante());
@@ -70,54 +106,54 @@ public class ControleurJeu extends KeyAdapter
 				timerChute.schedule(new TimerChute(), 500, 500);
 			}
 		}
-		else if (partie.estEnPause() && e.getKeyCode() == KeyEvent.VK_PAUSE)
+		else if (partie.estEnPause() && e.getKeyCode() == KeyEvent.VK_PAUSE) // Reprise d'une partie mise en pause
 		{
 			timerChute = new Timer();
 			timerChute.schedule(new TimerChute(), 0, 500);
 			partie.reprendrePartie();
 		}
-		else if (!partie.estEnPause() && e.getKeyCode() == KeyEvent.VK_PAUSE)
+		else if (!partie.estEnPause() && e.getKeyCode() == KeyEvent.VK_PAUSE) // Mise en pause
 		{
 			timerChute.cancel();
 			partie.mettreEnPause();
 		}
 		else if (!partie.estEnPause() && !partie.getPieceCourante().estCassee())
-		{
+		{ // On ne peut effectuer les actions que si la partie n'est pas en pause et que la pièce n'est pas cassée.
 			switch (e.getKeyCode())
 			{
-				case KeyEvent.VK_LEFT: // flèche gauche
-					synchronized (partie.getPlateau())
+				case KeyEvent.VK_LEFT: // flèche gauche --> translation de la pièce vers la gauche
+					synchronized (partie.getPlateau()) // On verrouille le plateau pour être sûr de ne pas avoir d'accès concurrent.
 					{
 						partie.getPlateau().translationHorizontale(Plateau.GAUCHE, partie.getPieceCourante());
-						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone()); // On met à jour l'affichage
 					}
 				break;
-				case KeyEvent.VK_RIGHT: // flèche droite
-					synchronized (partie.getPlateau())
+				case KeyEvent.VK_RIGHT: // flèche droite --> translation de la pièce vers la droite
+					synchronized (partie.getPlateau()) // On verrouille le plateau pour être sûr de ne pas avoir d'accès concurrent.
 					{
 						partie.getPlateau().translationHorizontale(Plateau.DROITE, partie.getPieceCourante());
-						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone()); // On met à jour l'affichage
 					}
 				break;
-				case KeyEvent.VK_DOWN: // flèche bas
-					synchronized (partie.getPlateau())
+				case KeyEvent.VK_DOWN: // flèche bas --> rotation dans le sens horaire
+					synchronized (partie.getPlateau()) // On verrouille le plateau pour être sûr de ne pas avoir d'accès concurrent.
 					{
 						partie.getPlateau().rotation(Plateau.HORAIRE, partie.getPieceCourante());
-						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone()); // On met à jour l'affichage
 					}
 				break;
-				case KeyEvent.VK_UP: // flèche haut
-					synchronized (partie.getPlateau())
+				case KeyEvent.VK_UP: // flèche haut --> rotation dans le sens antihoraire
+					synchronized (partie.getPlateau()) // On verrouille le plateau pour être sûr de ne pas avoir d'accès concurrent.
 					{
 						partie.getPlateau().rotation(Plateau.ANTIHORAIRE, partie.getPieceCourante());
-						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone()); // On met à jour l'affichage
 					}
 				break;
-				case KeyEvent.VK_SPACE: // espace
-					synchronized (partie.getPlateau())
+				case KeyEvent.VK_SPACE: // espace --> accélérer la chute de la pièce
+					synchronized (partie.getPlateau()) // On verrouille le plateau pour être sûr de ne pas avoir d'accès concurrent.
 					{
 						partie.getPlateau().translationVerticale(partie.getPieceCourante());
-						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone()); // On met à jour l'affichage
 					}
 				break;
 			}
