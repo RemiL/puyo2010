@@ -2,6 +2,7 @@ package moteur;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -26,6 +27,8 @@ public class Plateau implements Cloneable
 	public static final int HAUTEUR = 15;
 	/** Tableau à deux dimensions représentant le plateau de jeu */
 	private Puyo[][] tabPlateau;
+	/** */
+	private ArrayList<Point> derniersPuyos;
 	
 	/**
 	 * Crée un nouveau plateau de jeu vide.
@@ -33,6 +36,7 @@ public class Plateau implements Cloneable
 	public Plateau()
 	{
 		tabPlateau = new Puyo[HAUTEUR][LARGEUR];
+		derniersPuyos = new ArrayList<Point>();
 	}
 	
 	/**
@@ -188,6 +192,7 @@ public class Plateau implements Cloneable
 					else // le puyo ne peut plus descendre, on le supprime de la forme
 					{
 						piece.remove(tabPlateau[i][j]);
+						derniersPuyos.add(new Point(i, j));
 						piece.setCassee();
 						creerLiens(piece, i, j);
 					}
@@ -258,21 +263,90 @@ public class Plateau implements Cloneable
 	{
 		if (i > 2) // Pas de liens pour les puyos hors de la zone visible du plateau.
 		{
-			if (i-1 > 3 && tabPlateau[i][j].equals(tabPlateau[i-1][j]))
+			if (i-1 > 3)
 			{
-				tabPlateau[i][j].setLien(Puyo.HAUT);
+				tabPlateau[i][j].setLien(Puyo.HAUT, tabPlateau[i][j].equals(tabPlateau[i-1][j]));
 			}
-			if (i+1 < HAUTEUR && tabPlateau[i][j].equals(tabPlateau[i+1][j]))
+			if (i+1 < HAUTEUR && tabPlateau[i+1][j] != null)
 			{
-				tabPlateau[i+1][j].setLien(Puyo.HAUT);
+				tabPlateau[i+1][j].setLien(Puyo.HAUT, tabPlateau[i][j].equals(tabPlateau[i+1][j]));
 			}
-			if (j+1 < LARGEUR && tabPlateau[i][j].equals(tabPlateau[i][j+1]) && !piece.containsKey(tabPlateau[i][j+1]))
+			if (j+1 < LARGEUR)
 			{
-				tabPlateau[i][j].setLien(Puyo.DROITE);
+				tabPlateau[i][j].setLien(Puyo.DROITE, tabPlateau[i][j].equals(tabPlateau[i][j+1]) && (piece == null || !piece.containsKey(tabPlateau[i][j+1])));
 			}
-			if (j-1 >= 0 && tabPlateau[i][j].equals(tabPlateau[i][j-1]) && !piece.containsKey(tabPlateau[i][j-1]))
+			if (j-1 >= 0 && tabPlateau[i][j-1] != null)
 			{
-				tabPlateau[i][j-1].setLien(Puyo.DROITE);
+				tabPlateau[i][j-1].setLien(Puyo.DROITE, tabPlateau[i][j].equals(tabPlateau[i][j-1]) && (piece == null || !piece.containsKey(tabPlateau[i][j-1])));
+			}
+		}
+	}
+
+	public boolean detruireBlocs()
+	{
+		boolean blocDetruit = false;
+		
+		for(Point point : derniersPuyos)
+		{
+			if(tabPlateau[point.x][point.y] != null)
+			{
+				ArrayList<Point> listePointsBloc = new ArrayList<Point>();
+				parcoursBloc(tabPlateau[point.x][point.y].getCouleur(), point.x, point.y, listePointsBloc);
+				
+				if(listePointsBloc.size() >= 4)
+				{
+					blocDetruit = true;
+					for(Point p : listePointsBloc)
+						tabPlateau[p.x][p.y] = null;
+				}
+			}
+		}
+		
+		derniersPuyos.clear();
+		
+		return blocDetruit;
+	}
+
+	private void parcoursBloc(Color couleur, int i, int j, ArrayList<Point> listePointsBloc) 
+	{
+		if(i >= 3 && i < HAUTEUR && j >= 0 && j < LARGEUR && !listePointsBloc.contains(new Point(i, j)) && tabPlateau[i][j] != null && tabPlateau[i][j].getCouleur().equals(couleur))
+		{
+			listePointsBloc.add(new Point(i, j));
+			parcoursBloc(couleur, i+1, j, listePointsBloc);
+			parcoursBloc(couleur, i-1, j, listePointsBloc);
+			parcoursBloc(couleur, i, j+1, listePointsBloc);
+			parcoursBloc(couleur, i, j-1, listePointsBloc);
+		}
+	}
+
+	public void faireChuterPuyos()
+	{
+		int di;
+		
+		for (int i=HAUTEUR-2; i>=3; i--)
+		{
+			for (int j=0; j<LARGEUR; j++)
+			{
+				if (tabPlateau[i][j] != null)
+				{
+					di = 1;
+					
+					while (i+di < HAUTEUR && tabPlateau[i+di][j] == null)
+					{
+						tabPlateau[i+di][j] = tabPlateau[i+di-1][j];
+						tabPlateau[i+di-1][j] = null;
+						di++;
+					}
+					
+					if (di > 1)
+					{
+						derniersPuyos.add(new Point(i+di-1, j));
+						creerLiens(null, i+di-1, j);
+						if (j > 0 && tabPlateau[i][j-1] != null)
+							creerLiens(null, i, j-1);
+					}
+				}
+					
 			}
 		}
 	}

@@ -79,9 +79,9 @@ public class Puyo
 	 * Permet d'indiquer que le lien désigné par l'indice lien existe.
 	 * @param lien l'indice correspondant au lien.
 	 */
-	public void setLien(int lien)
+	public void setLien(int lien, boolean existe)
 	{
-		liens[lien] = true;
+		liens[lien] = existe;
 	}
 	
 	/**

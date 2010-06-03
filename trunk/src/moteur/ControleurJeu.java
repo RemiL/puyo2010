@@ -52,8 +52,31 @@ public class ControleurJeu extends KeyAdapter
 			synchronized (partie.getPlateau()) // On verrouille le plateau pour être sûr de ne pas avoir d'accès concurrent.
 			{
 				if (!partie.getPlateau().translationVerticale(partie.getPieceCourante())) // Si la pièce ne peut plus descendre
+				{
+					zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+					attente(200);
+					
+					while (partie.getPlateau().detruireBlocs())
+					{
+						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+						attente(200);
+						partie.getPlateau().faireChuterPuyos();
+						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+						attente(200);
+					}
 					zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante()); // On charge la suivante
+				}
 				zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone()); // On met à jour l'affichage
+			}
+		}
+		
+		private void attente(long ms)
+		{
+			try {
+				Thread.sleep(ms);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		
