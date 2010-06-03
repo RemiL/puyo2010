@@ -129,6 +129,13 @@ public class ControleurJeu extends KeyAdapter
 				timerChute.schedule(new TimerChute(), 500, 500);
 			}
 		}
+		else if (partie.estEnCours() && e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
+		{
+			timerChute.cancel();
+			partie = new Partie();
+			zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+			zoneDeJeu.chargerPiecesSuivantes(partie.getPiecesSuivantes());
+		}
 		else if (partie.estEnPause() && e.getKeyCode() == KeyEvent.VK_PAUSE) // Reprise d'une partie mise en pause
 		{
 			timerChute = new Timer();
