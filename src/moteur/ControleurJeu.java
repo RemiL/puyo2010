@@ -39,6 +39,7 @@ public class ControleurJeu extends KeyAdapter
 	private class TimerChute extends TimerTask
 	{
 		int score;
+		int ret;
 		
 		public TimerChute()
 		{
@@ -53,7 +54,9 @@ public class ControleurJeu extends KeyAdapter
 		{
 			synchronized (partie.getPlateau()) // On verrouille le plateau pour être sûr de ne pas avoir d'accès concurrent.
 			{
-				if (!partie.getPlateau().translationVerticale(partie.getPieceCourante())) // Si la pièce ne peut plus descendre
+				ret = partie.getPlateau().translationVerticale(partie.getPieceCourante());
+				
+				if (ret == Plateau.PIECE_VIDE) // Si la pièce ne peut plus descendre
 				{
 					zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
 					attente(200);
@@ -72,7 +75,13 @@ public class ControleurJeu extends KeyAdapter
 					partie.resetCombo();
 					zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante()); // On charge la suivante
 				}
-				zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone()); // On met à jour l'affichage
+				else if(ret == Plateau.PERDU)
+				{
+					timerChute.cancel();
+					partie = new Partie();
+				}
+				else
+					zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone()); // On met à jour l'affichage
 			}
 		}
 		
@@ -130,6 +139,7 @@ public class ControleurJeu extends KeyAdapter
 			{
 				partie.commencerPartie();
 				zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante());
+				zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
 				
 				timerChute = new Timer();
 				timerChute.schedule(new TimerChute(), 500, 500);

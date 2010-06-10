@@ -107,7 +107,7 @@ public class Partie
 	{
 		return start;
 	}
-	
+		
 	/**
 	 * Permet d'indiquer que la partie est actuellement mise en pause.
 	 */
