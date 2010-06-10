@@ -64,7 +64,12 @@ public class ControleurJeu extends KeyAdapter
 					while ((score = partie.getPlateau().detruireBlocs()) != 0)
 					{
 						partie.ajoutCombo();
-						partie.ajoutScore(score);
+						if (partie.ajoutScore(score) && partie.getDifficulte() < 10)
+						{
+							timerChute.cancel();
+							timerChute = new Timer();
+							timerChute.schedule(new TimerChute(), 0, 500 - partie.getDifficulte()*50);
+						}
 						zoneDeJeu.chargerScore(partie.getScore(), partie.getCombo());
 						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
 						attente(200);
@@ -140,6 +145,7 @@ public class ControleurJeu extends KeyAdapter
 				partie.commencerPartie();
 				zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante());
 				zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
+				zoneDeJeu.chargerScore(partie.getScore(), partie.getCombo());
 				
 				timerChute = new Timer();
 				timerChute.schedule(new TimerChute(), 500, 500);

@@ -145,9 +145,14 @@ public class Partie
 		combo=0;
 	}
 
-	public void ajoutScore(int score2)
+	public boolean ajoutScore(int score2)
 	{
 		score += combo * score2;
+		
+		int sauvDifficulte = difficulte;
+		difficulte = score / 1000;
+		
+		return (sauvDifficulte != difficulte);
 	}
 	
 	public int getScore()
@@ -158,5 +163,10 @@ public class Partie
 	public int getCombo()
 	{
 		return combo;
+	}
+	
+	public int getDifficulte()
+	{
+		return difficulte;
 	}
 }
