@@ -25,6 +25,9 @@ public class Plateau implements Cloneable
 	public static final int LARGEUR = 6;
 	/** Constante désignant la hauteur du plateau de jeu dans la présentation interne */
 	public static final int HAUTEUR = 15;
+	public static final int PERDU = -1;
+	public static final int PIECE_VIDE = 0;
+	public static final int PIECE_NON_VIDE = 1;
 	/** Tableau à deux dimensions représentant le plateau de jeu */
 	private Puyo[][] tabPlateau;
 	/** */
@@ -175,7 +178,7 @@ public class Plateau implements Cloneable
 	 * @return un booleen indiquant si la pièce contient encore des puyos
 	 * pouvant éventuellement encore descendre.
 	 */
-	public boolean translationVerticale(Piece piece)
+	public int translationVerticale(Piece piece)
 	{
 		for (int i=piece.getMaxI(); i>=piece.getMinI(); i--)
 		{
@@ -191,6 +194,9 @@ public class Plateau implements Cloneable
 					}
 					else // le puyo ne peut plus descendre, on le supprime de la forme
 					{
+						if(i < 3)
+							return PERDU;
+							
 						piece.remove(tabPlateau[i][j]);
 						derniersPuyos.add(new Point(i, j));
 						piece.setCassee();
@@ -200,7 +206,8 @@ public class Plateau implements Cloneable
 			}
 		}
 		
-		return !piece.isEmpty();
+		if (piece.isEmpty()) return PIECE_VIDE;
+		else return PIECE_NON_VIDE;
 	}
 	
 	/**
