@@ -38,6 +38,8 @@ public class ControleurJeu extends KeyAdapter
 	 */
 	private class TimerChute extends TimerTask
 	{
+		int score;
+		
 		public TimerChute()
 		{
 			super();
@@ -56,14 +58,18 @@ public class ControleurJeu extends KeyAdapter
 					zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
 					attente(200);
 					
-					while (partie.getPlateau().detruireBlocs())
+					while ((score = partie.getPlateau().detruireBlocs()) != 0)
 					{
+						partie.ajoutCombo();
+						partie.ajoutScore(score);
+						zoneDeJeu.chargerScore(partie.getScore(), partie.getCombo());
 						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
 						attente(200);
 						partie.getPlateau().faireChuterPuyos();
 						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
 						attente(200);
 					}
+					partie.resetCombo();
 					zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante()); // On charge la suivante
 				}
 				zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone()); // On met à jour l'affichage

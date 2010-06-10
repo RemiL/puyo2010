@@ -282,9 +282,9 @@ public class Plateau implements Cloneable
 		}
 	}
 
-	public boolean detruireBlocs()
+	public int detruireBlocs()
 	{
-		boolean blocDetruit = false;
+		int score = 0;
 		
 		for(Point point : derniersPuyos)
 		{
@@ -295,7 +295,7 @@ public class Plateau implements Cloneable
 				
 				if(listePointsBloc.size() >= 4)
 				{
-					blocDetruit = true;
+					score += 100 + (listePointsBloc.size()-4)*10;		
 					for(Point p : listePointsBloc)
 						tabPlateau[p.x][p.y] = null;
 				}
@@ -304,7 +304,7 @@ public class Plateau implements Cloneable
 		
 		derniersPuyos.clear();
 		
-		return blocDetruit;
+		return score;
 	}
 
 	private void parcoursBloc(Color couleur, int i, int j, ArrayList<Point> listePointsBloc) 

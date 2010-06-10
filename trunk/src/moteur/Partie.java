@@ -134,4 +134,29 @@ public class Partie
 	{
 		return pause;
 	}
+	
+	public void  ajoutCombo()
+	{
+		combo++;
+	}
+	
+	public void resetCombo()
+	{
+		combo=0;
+	}
+
+	public void ajoutScore(int score2)
+	{
+		score += combo * score2;
+	}
+	
+	public int getScore()
+	{
+		return score;
+	}
+	
+	public int getCombo()
+	{
+		return combo;
+	}
 }

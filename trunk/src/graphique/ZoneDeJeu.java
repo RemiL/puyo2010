@@ -21,6 +21,7 @@ import moteur.Plateau;
 import moteur.Puyo;
 
 import com.sun.opengl.util.FPSAnimator;
+import com.sun.opengl.util.GLUT;
 
 /**
  * Classe dérivant d'un GLCanvas et implémentant l'interface GLEventListener
@@ -34,6 +35,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 	private static final long serialVersionUID = 2421808737959876690L;
 	/** The GL unit (helper class). */
     private GLU glu;
+    private GLUT glut;
     /** Permet d'effectuer la boucle principale d'affichage */
     private FPSAnimator animator;
     /** Le plateau actuellement affiché */
@@ -52,6 +54,8 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
     private int listePiecesSuivantes;
     /** La texture permettant d'afficher l'image de fond */
     private int texture;
+    private int score;
+    private int combo;
 	
     /**
      * Crée une nouvelle zone de jeu de taille width sur height pixels utilisant
@@ -80,6 +84,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 	public void init(GLAutoDrawable drawable)
 	{
 		glu = new GLU();
+		glut = new GLUT();
 		
 		drawable.setGL(new DebugGL(drawable.getGL()));
         final GL gl = drawable.getGL();
@@ -95,7 +100,6 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		gl.glEndList();
 		
 		// Chargement de la texture de fond.
-        gl.glEnable(GL.GL_TEXTURE_2D);
         texture = genTexture(gl);
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture);
         TextureReader.Texture texture = null;
@@ -127,6 +131,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
         glu.gluOrtho2D(0.0, width, 0.0, height); 
 	}
 	
+	
 	/**
 	 * Méthode appelée par la boucle d'affichage.
 	 */
@@ -135,9 +140,10 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		final GL gl = drawable.getGL();
 		
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-		gl.glBindTexture(GL.GL_TEXTURE_2D, texture);
+		//gl.glBindTexture(GL.GL_TEXTURE_2D, texture);
 		
 		// Fond
+		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBegin(GL.GL_QUADS);
 			gl.glColor3f(1, 1, 1);
 	        gl.glTexCoord2i(0, 0);
@@ -149,6 +155,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 	        gl.glTexCoord2i(0, 1);
 	        gl.glVertex2i(0, 600);
 	    gl.glEnd();
+	    gl.glDisable(GL.GL_TEXTURE_2D);
 		
 		if (majNecessairePlateau) // Si la mise à jour est nécessaire
 			faireListePlateau(gl); // on reconstruit la display-list du plateau
@@ -159,6 +166,12 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		gl.glCallList(listePiecesSuivantes);
 		gl.glCallList(listePlateau);
 		
+		gl.glColor3f(1, 1, 1);
+		gl.glRasterPos2f(500, 70);
+		glut.glutBitmapString(GLUT.BITMAP_HELVETICA_18, "SCORE : " + score);
+		gl.glRasterPos2f(600, 70);
+		glut.glutBitmapString(GLUT.BITMAP_HELVETICA_18, "COMBO : " + combo);
+	
 		gl.glFlush();
 	}
 	
@@ -309,6 +322,12 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 			gl.glPopMatrix();
 		gl.glEndList();
 			
+	}
+	
+	public void chargerScore(int score, int combo)
+	{
+		this.score = score;
+		this.combo = combo;
 	}
 	
 	private void makeRGBTexture(GL gl, GLU glu, TextureReader.Texture img, int target, boolean mipmapped)
