@@ -152,6 +152,9 @@ public class Partie
 		int sauvDifficulte = difficulte;
 		difficulte = score / 1000;
 		
+		if (difficulte > 9)
+			difficulte = 9;
+		
 		return (sauvDifficulte != difficulte);
 	}
 	

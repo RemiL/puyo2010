@@ -64,7 +64,7 @@ public class ControleurJeu extends KeyAdapter
 					while ((score = partie.getPlateau().detruireBlocs()) != 0)
 					{
 						partie.ajoutCombo();
-						if (partie.ajoutScore(score) && partie.getDifficulte() < 10)
+						if (partie.ajoutScore(score))
 						{
 							timerChute.cancel();
 							timerChute = new Timer();
