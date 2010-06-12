@@ -121,6 +121,7 @@ public class ControleurJeu extends KeyAdapter
 		
 		partie = new Partie();
 		zoneDeJeu.chargerPiecesSuivantes(partie.getPiecesSuivantes());
+		zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), false);
 	}
 	
 	/**
@@ -157,6 +158,7 @@ public class ControleurJeu extends KeyAdapter
 			partie = new Partie();
 			zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
 			zoneDeJeu.chargerPiecesSuivantes(partie.getPiecesSuivantes());
+			zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), false);
 		}
 		else if (partie.estEnPause() && e.getKeyCode() == KeyEvent.VK_PAUSE) // Reprise d'une partie mise en pause
 		{
@@ -164,7 +166,6 @@ public class ControleurJeu extends KeyAdapter
 			timerChute.schedule(new TimerChute(), 0, 500);
 			partie.reprendrePartie();
 			zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), false);
-			
 		}
 		else if (!partie.estEnPause() && e.getKeyCode() == KeyEvent.VK_PAUSE) // Mise en pause
 		{

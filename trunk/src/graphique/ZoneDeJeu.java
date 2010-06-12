@@ -58,12 +58,16 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
     private int listePause;
     /** La display-list correspondant à l'affichage du message de fin */
     private int listePerdu;
+    /** La display-list correspondant à l'affichage du message pour commencer */
+    private int listeCommence;
     /** La texture permettant d'afficher l'image de fond */
     private int textureFond;
     /** La texture permettant d'afficher l'image de pause */
     private int texturePause;
     /** La texture permettant d'afficher le message de fin */
     private int texturePerdu;
+    /** La texture permettant d'afficher le message pour commencer */
+    private int textureCommence;
     /** Les textures de chiffre */
     private int[] texturesChiffres;
     /** Le score */
@@ -116,7 +120,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         
         // Display lists
-		listePuyo = gl.glGenLists(15); 
+		listePuyo = gl.glGenLists(16); 
 		listePlateau = listePuyo + 1;
 		listePiecesSuivantes = listePlateau + 1;
 		
@@ -127,6 +131,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		
 		listePause = listesChiffres[9] + 1;
 		listePerdu = listePause + 1;
+		listeCommence = listePerdu + 1;
 		
 		gl.glNewList(listePuyo, GL.GL_COMPILE);
 			dessinerCercle(gl, 0, 0, 15);
@@ -160,7 +165,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         makeRGBTexture(gl, glu, texturePause, GL.GL_TEXTURE_2D, false);
         
-     // Chargement de la texture perdu.
+        // Chargement de la texture perdu.
 		texturePerdu = genTexture(gl);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texturePerdu);
         TextureReader.Texture texturePerdu = null;
@@ -173,6 +178,20 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         makeRGBTexture(gl, glu, texturePerdu, GL.GL_TEXTURE_2D, false);
+        
+        // Chargement de la texture commence.
+		textureCommence = genTexture(gl);
+		gl.glBindTexture(GL.GL_TEXTURE_2D, textureCommence);
+        TextureReader.Texture textureCommence = null;
+        try {
+            textureCommence = TextureReader.readTexture("resources/commence.png");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+        makeRGBTexture(gl, glu, textureCommence, GL.GL_TEXTURE_2D, false);
         
         // Chargement des textures de chiffre.        
         gl.glGenTextures(10, texturesChiffres, 0);
@@ -195,12 +214,17 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
         faireListesChiffres(gl);
         faireListePause(gl);
         faireListePerdu(gl);
+        faireListeCommence(gl);
         
         // Boucle principale d'affichage
         animator = new FPSAnimator(this, 60);
         animator.start();
 	}
 	
+	/**
+	 * Créer la display-list pour l'affichage du panneau pause
+	 * @param gl
+	 */
 	private void faireListePause(GL gl) 
 	{
 		gl.glNewList(listePause, GL.GL_COMPILE);
@@ -221,6 +245,10 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 	    gl.glEndList();
 	}
 	
+	/**
+	 * Créer la display-list pour l'affichage du panneau perdu
+	 * @param gl
+	 */
 	private void faireListePerdu(GL gl) 
 	{
 		gl.glNewList(listePerdu, GL.GL_COMPILE);
@@ -236,6 +264,30 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		        gl.glVertex2i(800, 600);
 		        gl.glTexCoord2i(0, 1);
 		        gl.glVertex2i(0, 600);
+		    gl.glEnd();
+		    gl.glDisable(GL.GL_TEXTURE_2D);
+	    gl.glEndList();
+	}
+	
+	/**
+	 * Créer la display-list pour l'affichage du panneau commence
+	 * @param gl
+	 */
+	private void faireListeCommence(GL gl)
+	{
+		gl.glNewList(listeCommence, GL.GL_COMPILE);
+			gl.glEnable(GL.GL_TEXTURE_2D);
+			gl.glBindTexture(GL.GL_TEXTURE_2D, textureCommence);
+			gl.glBegin(GL.GL_QUADS);
+				gl.glColor3f(1, 1, 1);
+		        gl.glTexCoord2i(0, 0);
+		        gl.glVertex2i(0, 0);
+		        gl.glTexCoord2i(1, 0);
+		        gl.glVertex2i(100, 0);
+		        gl.glTexCoord2i(1, 1);
+		        gl.glVertex2i(100, 100);
+		        gl.glTexCoord2i(0, 1);
+		        gl.glVertex2i(0, 100);
 		    gl.glEnd();
 		    gl.glDisable(GL.GL_TEXTURE_2D);
 	    gl.glEndList();
@@ -525,6 +577,14 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 					gl.glCallList(listePause);
 				gl.glPopMatrix();
 			}
+			else if(!start)
+			{
+				gl.glPushMatrix();
+					gl.glTranslated(350, 160, 0);
+					gl.glCallList(listeCommence);
+				gl.glPopMatrix();
+			}
+				
 		}
 		else
 		{
