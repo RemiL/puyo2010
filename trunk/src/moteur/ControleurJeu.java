@@ -70,7 +70,7 @@ public class ControleurJeu extends KeyAdapter
 							timerChute = new Timer();
 							timerChute.schedule(new TimerChute(), 0, 500 - partie.getDifficulte()*50);
 						}
-						zoneDeJeu.chargerScore(partie.getScore(), partie.getCombo());
+						zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte());
 						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
 						attente(200);
 						partie.getPlateau().faireChuterPuyos();
@@ -95,7 +95,6 @@ public class ControleurJeu extends KeyAdapter
 			try {
 				Thread.sleep(ms);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -145,7 +144,7 @@ public class ControleurJeu extends KeyAdapter
 				partie.commencerPartie();
 				zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante());
 				zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
-				zoneDeJeu.chargerScore(partie.getScore(), partie.getCombo());
+				zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte());
 				
 				timerChute = new Timer();
 				timerChute.schedule(new TimerChute(), 500, 500);
