@@ -70,7 +70,7 @@ public class ControleurJeu extends KeyAdapter
 							timerChute = new Timer();
 							timerChute.schedule(new TimerChute(), 0, 500 - partie.getDifficulte()*50);
 						}
-						zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte());
+						zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), false);
 						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
 						attente(200);
 						partie.getPlateau().faireChuterPuyos();
@@ -82,6 +82,7 @@ public class ControleurJeu extends KeyAdapter
 				}
 				else if(ret == Plateau.PERDU)
 				{
+					zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), true);
 					timerChute.cancel();
 					partie = new Partie();
 				}
@@ -144,7 +145,7 @@ public class ControleurJeu extends KeyAdapter
 				partie.commencerPartie();
 				zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante());
 				zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
-				zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte());
+				zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), false);
 				
 				timerChute = new Timer();
 				timerChute.schedule(new TimerChute(), 500, 500);
@@ -162,11 +163,14 @@ public class ControleurJeu extends KeyAdapter
 			timerChute = new Timer();
 			timerChute.schedule(new TimerChute(), 0, 500);
 			partie.reprendrePartie();
+			zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), false);
+			
 		}
 		else if (!partie.estEnPause() && e.getKeyCode() == KeyEvent.VK_PAUSE) // Mise en pause
 		{
 			timerChute.cancel();
 			partie.mettreEnPause();
+			zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(),partie.estEnPause(), false);
 		}
 		else if (!partie.estEnPause() && !partie.getPieceCourante().estCassee())
 		{ // On ne peut effectuer les actions que si la partie n'est pas en pause et que la pièce n'est pas cassée.

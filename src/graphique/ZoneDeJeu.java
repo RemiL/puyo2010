@@ -54,8 +54,16 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
     private int listePiecesSuivantes;
     /** Le tableau contenant les display-lists correspondant aux chiffres */
     private int[] listesChiffres;
+    /** La display-list correspondant à l'affichage de l'icône pause */
+    private int listePause;
+    /** La display-list correspondant à l'affichage du message de fin */
+    private int listePerdu;
     /** La texture permettant d'afficher l'image de fond */
     private int textureFond;
+    /** La texture permettant d'afficher l'image de pause */
+    private int texturePause;
+    /** La texture permettant d'afficher le message de fin */
+    private int texturePerdu;
     /** Les textures de chiffre */
     private int[] texturesChiffres;
     /** Le score */
@@ -64,6 +72,12 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
     private int combo;
     /** La difficulté */
     private int difficulte;
+    /** La partie est démarrée */
+    private boolean start;
+    /** La partie est en pause */
+    private boolean pause;
+    /** La partie est perdu */
+    private boolean perdu;
 	
     /**
      * Crée une nouvelle zone de jeu de taille width sur height pixels utilisant
@@ -102,7 +116,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         
         // Display lists
-		listePuyo = gl.glGenLists(13); 
+		listePuyo = gl.glGenLists(15); 
 		listePlateau = listePuyo + 1;
 		listePiecesSuivantes = listePlateau + 1;
 		
@@ -110,6 +124,9 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		{
 			listesChiffres[i] = listePiecesSuivantes + i + 1;
 		}
+		
+		listePause = listesChiffres[9] + 1;
+		listePerdu = listePause + 1;
 		
 		gl.glNewList(listePuyo, GL.GL_COMPILE);
 			dessinerCercle(gl, 0, 0, 15);
@@ -128,6 +145,34 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         makeRGBTexture(gl, glu, textureFond, GL.GL_TEXTURE_2D, false);
+        
+        // Chargement de la texture de pause.
+		texturePause = genTexture(gl);
+		gl.glBindTexture(GL.GL_TEXTURE_2D, texturePause);
+        TextureReader.Texture texturePause = null;
+        try {
+            texturePause = TextureReader.readTexture("resources/pause.png");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+        makeRGBTexture(gl, glu, texturePause, GL.GL_TEXTURE_2D, false);
+        
+     // Chargement de la texture perdu.
+		texturePerdu = genTexture(gl);
+		gl.glBindTexture(GL.GL_TEXTURE_2D, texturePerdu);
+        TextureReader.Texture texturePerdu = null;
+        try {
+            texturePerdu = TextureReader.readTexture("resources/perdu.png");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+        makeRGBTexture(gl, glu, texturePerdu, GL.GL_TEXTURE_2D, false);
         
         // Chargement des textures de chiffre.        
         gl.glGenTextures(10, texturesChiffres, 0);
@@ -148,12 +193,54 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
         }
         
         faireListesChiffres(gl);
+        faireListePause(gl);
+        faireListePerdu(gl);
         
         // Boucle principale d'affichage
         animator = new FPSAnimator(this, 60);
         animator.start();
 	}
 	
+	private void faireListePause(GL gl) 
+	{
+		gl.glNewList(listePause, GL.GL_COMPILE);
+			gl.glEnable(GL.GL_TEXTURE_2D);
+			gl.glBindTexture(GL.GL_TEXTURE_2D, texturePause);
+			gl.glBegin(GL.GL_QUADS);
+				gl.glColor3f(1, 1, 1);
+		        gl.glTexCoord2i(0, 0);
+		        gl.glVertex2i(0, 0);
+		        gl.glTexCoord2i(1, 0);
+		        gl.glVertex2i(100, 0);
+		        gl.glTexCoord2i(1, 1);
+		        gl.glVertex2i(100, 100);
+		        gl.glTexCoord2i(0, 1);
+		        gl.glVertex2i(0, 100);
+		    gl.glEnd();
+		    gl.glDisable(GL.GL_TEXTURE_2D);
+	    gl.glEndList();
+	}
+	
+	private void faireListePerdu(GL gl) 
+	{
+		gl.glNewList(listePerdu, GL.GL_COMPILE);
+			gl.glEnable(GL.GL_TEXTURE_2D);
+			gl.glBindTexture(GL.GL_TEXTURE_2D, texturePerdu);
+			gl.glBegin(GL.GL_QUADS);
+				gl.glColor3f(1, 1, 1);
+		        gl.glTexCoord2i(0, 0);
+		        gl.glVertex2i(0, 0);
+		        gl.glTexCoord2i(1, 0);
+		        gl.glVertex2i(800, 0);
+		        gl.glTexCoord2i(1, 1);
+		        gl.glVertex2i(800, 600);
+		        gl.glTexCoord2i(0, 1);
+		        gl.glVertex2i(0, 600);
+		    gl.glEnd();
+		    gl.glDisable(GL.GL_TEXTURE_2D);
+	    gl.glEndList();
+	}
+
 	/**
 	 * Méthode appelée après que la zone d'affichage ait été redimensionnée,
 	 * maintient un affichage cohérent après le redimensionnement.
@@ -389,52 +476,94 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 	
 	private void afficherInfo(GL gl)
 	{
-		// Affichage du score
-		int scoreTmp = score;
-		gl.glPushMatrix();
-			gl.glTranslated(530, 150, 0);
-			for(int i=4; i>=0; i--)
+		if(!perdu)
+		{
+			// Affichage du score
+			int scoreTmp = score;
+			gl.glPushMatrix();
+				gl.glTranslated(530, 150, 0);
+				for(int i=4; i>=0; i--)
+				{
+					int unite = (int) (scoreTmp / Math.pow(10, i));
+					scoreTmp -= unite * Math.pow(10, i);
+					gl.glCallList(listesChiffres[unite]);
+					gl.glTranslated(52, 0, 0);
+				}
+			gl.glPopMatrix();
+			
+			// Affichage du combo
+			int comboTmp = combo;
+			gl.glPushMatrix();
+				gl.glTranslated(686, 88, 0);
+				for(int i=1; i>=0; i--)
+				{
+					int unite = (int) (comboTmp / Math.pow(10, i));
+					comboTmp -= unite * Math.pow(10, i);
+					gl.glCallList(listesChiffres[unite]);
+					gl.glTranslated(52, 0, 0);
+				}
+			gl.glPopMatrix();
+			
+			// Affichage de la difficulté
+			int difficulteTmp = difficulte;
+			
+			gl.glPushMatrix();
+				gl.glTranslated(686, 25, 0);
+				for(int i=1; i>=0; i--)
+				{
+					int unite = (int) (difficulteTmp / Math.pow(10, i));
+					difficulteTmp -= unite * Math.pow(10, i);
+					gl.glCallList(listesChiffres[unite]);
+					gl.glTranslated(52, 0, 0);
+				}
+			gl.glPopMatrix();
+			
+			if(pause)
 			{
-				int unite = (int) (scoreTmp / Math.pow(10, i));
-				scoreTmp -= unite * Math.pow(10, i);
-				gl.glCallList(listesChiffres[unite]);
-				gl.glTranslated(52, 0, 0);
+				gl.glPushMatrix();
+					gl.glTranslated(350, 160, 0);
+					gl.glCallList(listePause);
+				gl.glPopMatrix();
 			}
-		gl.glPopMatrix();
-		
-		// Affichage du combo
-		int comboTmp = combo;
-		gl.glPushMatrix();
-			gl.glTranslated(686, 88, 0);
-			for(int i=1; i>=0; i--)
-			{
-				int unite = (int) (comboTmp / Math.pow(10, i));
-				comboTmp -= unite * Math.pow(10, i);
-				gl.glCallList(listesChiffres[unite]);
-				gl.glTranslated(52, 0, 0);
-			}
-		gl.glPopMatrix();
-		
-		// Affichage de la difficulté
-		int difficluteTmp = difficulte;
-		
-		gl.glPushMatrix();
-			gl.glTranslated(686, 25, 0);
-			for(int i=1; i>=0; i--)
-			{
-				int unite = (int) (difficluteTmp / Math.pow(10, i));
-				difficluteTmp -= unite * Math.pow(10, i);
-				gl.glCallList(listesChiffres[unite]);
-				gl.glTranslated(52, 0, 0);
-			}
-		gl.glPopMatrix();
+		}
+		else
+		{
+			gl.glPushMatrix();
+				gl.glCallList(listePerdu);
+				gl.glPushMatrix();
+					gl.glTranslated(275, 324, 0);
+					int scoreTmp2 = score;
+					for(int i=4; i>=0; i--)
+					{
+						int unite = (int) (scoreTmp2 / Math.pow(10, i));
+						scoreTmp2 -= unite * Math.pow(10, i);
+						gl.glCallList(listesChiffres[unite]);
+						gl.glTranslated(52, 0, 0);
+					}
+				gl.glPopMatrix();
+				gl.glPushMatrix();
+					int difficulteTmp2 = difficulte;
+					gl.glTranslated(431, 262, 0);
+					for(int i=1; i>=0; i--)
+					{
+						int unite = (int) (difficulteTmp2 / Math.pow(10, i));
+						difficulteTmp2 -= unite * Math.pow(10, i);
+						gl.glCallList(listesChiffres[unite]);
+						gl.glTranslated(52, 0, 0);
+					}
+				gl.glPopMatrix();
+			gl.glPopMatrix();
+		}
 	}
 	
-	public void chargerInfo(int score, int combo, int difficulte)
+	public void chargerInfo(int score, int combo, int difficulte, boolean start, boolean pause, boolean perdu)
 	{
 		this.score = score;
 		this.combo = combo;
 		this.difficulte = difficulte + 1;
+		this.start = start;
+		this.pause = pause;
+		this.perdu = perdu;
 	}
 	
 	private void makeRGBTexture(GL gl, GLU glu, TextureReader.Texture img, int target, boolean mipmapped)
