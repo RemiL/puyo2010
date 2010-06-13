@@ -25,12 +25,15 @@ public class Plateau implements Cloneable
 	public static final int LARGEUR = 6;
 	/** Constante désignant la hauteur du plateau de jeu dans la présentation interne */
 	public static final int HAUTEUR = 15;
+	/** Constante indiquant que le jeu est perdu */
 	public static final int PERDU = -1;
+	/** Constante indiquant que tous les puyos de la pièce sont bloqués */
 	public static final int PIECE_VIDE = 0;
+	/** Constante indiquant que la pièce comporte toujours des puyos non bloqués */
 	public static final int PIECE_NON_VIDE = 1;
 	/** Tableau à deux dimensions représentant le plateau de jeu */
 	private Puyo[][] tabPlateau;
-	/** */
+	/** Les puyos à vérifier pour la destruction éventuelle de blocs */
 	private ArrayList<Point> derniersPuyos;
 	
 	/**
@@ -173,10 +176,12 @@ public class Plateau implements Cloneable
 	 * Permet de faire descendre la pièce fournie d'une case dans
 	 * le plateau de jeu. Seuls les puyos de la pièce pour lesquels
 	 * la chute est possible sont déplacés.
-	 * Retourne faux tous les puyos de la pièce sont bloqués et vrai sinon.
+	 * Retourne PERDU si un Puyo est bloqué hors de la zone de jeu,
+	 * PIECE_VIDE si tous les puyos de la pièce sont bloqués ou
+	 * PIECE_NON_VIDE s'il reste des puyos pouvant encore descendre.
 	 * @param piece la pièce a déplacé.
-	 * @return un booleen indiquant si la pièce contient encore des puyos
-	 * pouvant éventuellement encore descendre.
+	 * @return un entier indiquant si la pièce contient encore des puyos
+	 * pouvant éventuellement encore descendre ou non ou si le jeu est perdu.
 	 */
 	public int translationVerticale(Piece piece)
 	{
@@ -288,56 +293,87 @@ public class Plateau implements Cloneable
 			}
 		}
 	}
-
+	
+	/**
+	 * Permet de détruire les blocs comportant plus de 4 puyos actuellement
+	 * présent sur le plateau de jeu.
+	 * Retourne le score rapporté par les destructions effectuées : 100 points
+	 * par bloc de 4 puros détruit avec un bonus de 10 par puyo supplémentaire.
+	 * @return le score rapporté par les destructions effectuées ou 0 si
+	 * aucune destruction de bloc n'a été effectuée.
+	 */
 	public int detruireBlocs()
 	{
 		int score = 0;
 		
-		for(Point point : derniersPuyos)
+		for(Point point : derniersPuyos) // Pour tous les puyos dernièrement placés ou déplacés dans le tableau
 		{
-			if(tabPlateau[point.x][point.y] != null)
+			if(tabPlateau[point.x][point.y] != null) // S'il n'a pas déjà été supprimé
 			{
+				// On initialise une liste vide pour stocker les coordonnées des puyos d'un éventuel bloc
 				ArrayList<Point> listePointsBloc = new ArrayList<Point>();
+				// On remplit la liste.
 				parcoursBloc(tabPlateau[point.x][point.y].getCouleur(), point.x, point.y, listePointsBloc);
 				
-				if(listePointsBloc.size() >= 4)
+				if(listePointsBloc.size() >= 4) // Si elle comporte au moins 4 puyos
 				{
-					score += 100 + (listePointsBloc.size()-4)*10;		
-					for(Point p : listePointsBloc)
+					score += 100 + (listePointsBloc.size()-4)*10; // On calcule le score	
+					for(Point p : listePointsBloc) // et on supprime les puyos du plateau.
 						tabPlateau[p.x][p.y] = null;
 				}
 			}
 		}
 		
-		derniersPuyos.clear();
+		derniersPuyos.clear(); // On vide la liste des derniers puyos.
 		
 		return score;
 	}
-
+	
+	/**
+	 * Méthode permettant de parcourir récursivement le plateau à partir d'un point
+	 * pour ajouter à la liste fournie les coordonnées des puyos voisins directs
+	 * possédant la même couleur que celle fournie. A la fin de l'appel, la liste
+	 * contient toutes coordonnées d'un bloc de puyos reliés entre eux.
+	 * @param couleur la couleur du bloc recherché.
+	 * @param i la coordonnée désignant la ligne considérée. 
+	 * @param j la coordonnée désignant la colonne considérée. 
+	 * @param listePointsBloc la liste contenant les points du bloc.
+	 */
 	private void parcoursBloc(Color couleur, int i, int j, ArrayList<Point> listePointsBloc) 
 	{
-		if(i >= 3 && i < HAUTEUR && j >= 0 && j < LARGEUR && !listePointsBloc.contains(new Point(i, j)) && tabPlateau[i][j] != null && tabPlateau[i][j].getCouleur().equals(couleur))
+		if(i >= 3 && i < HAUTEUR && j >= 0 && j < LARGEUR // Si on ne sort pas du plateau
+				&& !listePointsBloc.contains(new Point(i, j)) // et que la casse n'a pas déjà été visitée
+				&& tabPlateau[i][j] != null // et qu'il y a bien un puyo dans cette case
+				&& tabPlateau[i][j].getCouleur().equals(couleur)) // et qu'il a la bonne couleur
 		{
-			listePointsBloc.add(new Point(i, j));
+			listePointsBloc.add(new Point(i, j)); // On ajoute le puyo à la liste
+			// et on relance la recherche recursivement sur ses voisins.
 			parcoursBloc(couleur, i+1, j, listePointsBloc);
 			parcoursBloc(couleur, i-1, j, listePointsBloc);
 			parcoursBloc(couleur, i, j+1, listePointsBloc);
 			parcoursBloc(couleur, i, j-1, listePointsBloc);
 		}
 	}
-
+	
+	/**
+	 * Méthode permettant de reorganiser le plateau après la destruction
+	 * de blocs en appliquant la gravité. Les puyos au-dessus d'une case
+	 * vide tombent autant qu'ils le peuvent.
+	 */
 	public void faireChuterPuyos()
 	{
 		int di;
 		
+		// On parcourt le tableau de jeu à partir de la deuxième ligne en partant du bas
 		for (int i=HAUTEUR-2; i>=3; i--)
 		{
 			for (int j=0; j<LARGEUR; j++)
 			{
-				if (tabPlateau[i][j] != null)
+				if (tabPlateau[i][j] != null) // Si la case est occupée
 				{
 					di = 1;
 					
+					// On descend le puyo autant que possible
 					while (i+di < HAUTEUR && tabPlateau[i+di][j] == null)
 					{
 						tabPlateau[i+di][j] = tabPlateau[i+di-1][j];
@@ -345,10 +381,13 @@ public class Plateau implements Cloneable
 						di++;
 					}
 					
-					if (di > 1)
+					if (di > 1) // Si on a déplacé le puyo
 					{
+						// On stocke ses coordonnées dans la liste des puyos récemment déplacés
 						derniersPuyos.add(new Point(i+di-1, j));
+						// On refait la création des liens du puyo
 						creerLiens(null, i+di-1, j);
+						// et de son ancien voisin.
 						if (j > 0 && tabPlateau[i][j-1] != null)
 							creerLiens(null, i, j-1);
 					}

@@ -8,7 +8,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.TreeMap;
 
 import javax.media.opengl.GLCapabilities;
 
@@ -66,39 +65,45 @@ public class ControleurJeu extends KeyAdapter
 					zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
 					attente(200);
 					
-					while ((score = partie.getPlateau().detruireBlocs()) != 0)
+					while ((score = partie.getPlateau().detruireBlocs()) != 0) // Tant qu'on a détruit un bloc au moins
 					{
-						partie.ajoutCombo();
-						if (partie.ajoutScore(score))
-						{
+						partie.ajoutCombo(); // On augmente le compteur de combo
+						if (partie.ajoutScore(score)) // On ajoute le score
+						{ // si la difficulté a été modifiée par l'ajout du score, on l'applique.
 							timerChute.cancel();
 							timerChute = new Timer();
 							timerChute.schedule(new TimerChute(), 0, 500 - partie.getDifficulte()*50);
 						}
+						// On met à jour le plateau et les infos de jeu.
 						zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), false);
 						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
 						attente(200);
-						partie.getPlateau().faireChuterPuyos();
+						partie.getPlateau().faireChuterPuyos(); // On applique la gravité.
 						zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
 						attente(200);
 					}
-					partie.resetCombo();
-					zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante()); // On charge la suivante
+					partie.resetCombo(); // On remet le compteur de combo à 0.
+					zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante()); // On charge la pièce suivante
 				}
-				else if(ret == Plateau.PERDU)
+				else if(ret == Plateau.PERDU) // Si on a perdu
 				{
+					// On met à jour les infos de jeu.
 					zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), true);
-					timerChute.cancel();
+					timerChute.cancel(); // On arrête le jeu
 					
-					verifierMeilleursScores(partie.getScore());
+					verifierMeilleursScores(partie.getScore()); // On vérifie les meilleurs scores.
 					
-					partie = new Partie();
+					partie = new Partie(); // On prépare une nouvelle partie
 				}
 				else
 					zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone()); // On met à jour l'affichage
 			}
 		}
 		
+		/**
+		 * Méthode permettant de faire attendre le timer pendant ms millisecondes.
+		 * @param ms le nombre de millisecondes à patienter.
+		 */
 		private void attente(long ms)
 		{
 			try {
@@ -147,9 +152,9 @@ public class ControleurJeu extends KeyAdapter
 	 */
 	public void keyPressed(KeyEvent e)
 	{
-		if (e.getKeyCode() == KeyEvent.VK_F2 || e.getKeyCode() == KeyEvent.VK_M || e.getKeyCode() == KeyEvent.VK_H)
+		if (e.getKeyCode() == KeyEvent.VK_F2 || e.getKeyCode() == KeyEvent.VK_M || e.getKeyCode() == KeyEvent.VK_H) // Affichage des meilleurs scores
 		{
-			if (partie.estEnCours() && !partie.estEnPause())
+			if (partie.estEnCours() && !partie.estEnPause()) // On met la partie en pause si elle est en cours.
 			{
 				timerChute.cancel();
 				partie.mettreEnPause();
@@ -235,46 +240,69 @@ public class ControleurJeu extends KeyAdapter
 		}
 	}
 	
+	/**
+	 * Méthode permettant de charger les meilleurs scores à partir du fichier
+	 * de sauvegarde des scores (PPMS.dat). Si le fichier n'existe pas, les
+	 * meilleurs scores retournés sont vides.
+	 * @return les meilleurs scores sauvegardés
+	 */
 	private MeilleursScores chargerMeilleursScores()
 	{
 		MeilleursScores meilleursScores;
 		try
-		{
+		{ // On essaie de lire la sauvegarde
 			ObjectInputStream deserialise = new ObjectInputStream(new FileInputStream("PPMS.dat"));
 			meilleursScores = (MeilleursScores) deserialise.readObject();
 			deserialise.close();
 		} catch (Exception e)
-		{
+		{ // En cas d'échec, on crée une nouvelle liste vide de meilleurs scores.
 			meilleursScores = new MeilleursScores();
 		}
 		
 		return meilleursScores;
 	}
 	
+	/**
+	 * Méthode permettant d'enregistrer les meilleurs scores dans le fichier
+	 * de sauvegarde des scores (PPMS.dat).
+	 * @param meilleursScores les meilleurs scores à sauvegarder.
+	 */
 	private void enregistrerMeilleursScores(MeilleursScores meilleursScores)
 	{
 		try
-		{
+		{ // On essaie d'écrire la sauvegarde.
 			ObjectOutputStream serialise = new ObjectOutputStream(new FileOutputStream("PPMS.dat"));
 			serialise.writeObject(meilleursScores);
 	        serialise.flush();
 	        serialise.close();
 		} catch (Exception e)
 		{
-			// On ne fait rien
+			// En cas d'échec, on ne fait rien ...
 		}
 	}
 	
+	/**
+	 * Méthode permettant de vérifier si le score fourni est un meilleur score.
+	 * Si oui, l'utilisateur se voit demander son nom puis les meilleurs scores
+	 * sont affichés.
+	 * @param score
+	 */
 	private void verifierMeilleursScores(int score)
 	{
+		// On charge la liste des meilleurs scores.
 		MeilleursScores meilleursScores = chargerMeilleursScores();
 		
+		// Si on n'a moins de 10 meilleurs scores sauvegardés ou si le nouveau score
+		// est meilleur que le plus mauvais des meilleurs scores sauvegardés.
 		if (meilleursScores.size() < 10 || meilleursScores.firstKey() < score)
 		{
+			// On ajoute le nouveau meilleur score
 			meilleursScores.ajout(score, fenetrePrincipale.demandeNom());
+			// et on affiche la liste des meilleurs scores.
 			fenetrePrincipale.afficheMeilleuresScores(meilleursScores);
+			
+			// On sauvegarde la liste modifiée.
+			enregistrerMeilleursScores(meilleursScores);
 		}
-		
-		enregistrerMeilleursScores(meilleursScores);
 	}
 }

@@ -21,7 +21,6 @@ import moteur.Plateau;
 import moteur.Puyo;
 
 import com.sun.opengl.util.FPSAnimator;
-import com.sun.opengl.util.GLUT;
 
 /**
  * Classe dérivant d'un GLCanvas et implémentant l'interface GLEventListener
@@ -35,7 +34,6 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 	private static final long serialVersionUID = 2421808737959876690L;
 	/** The GL unit (helper class). */
     private GLU glu;
-    private GLUT glut;
     /** Permet d'effectuer la boucle principale d'affichage */
     private FPSAnimator animator;
     /** Le plateau actuellement affiché */
@@ -110,7 +108,6 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 	public void init(GLAutoDrawable drawable)
 	{
 		glu = new GLU();
-		glut = new GLUT();
 		
 		texturesChiffres = new int[10];
 		listesChiffres = new int[10];
@@ -503,6 +500,10 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 			
 	}
 	
+	/**
+	 * Crée les display-lists permettant d'afficher les chiffres.
+	 * @param gl le contexte OpenGL.
+	 */
 	private void faireListesChiffres(GL gl)
 	{
 		for(int i=0; i<10; i++)
@@ -526,6 +527,10 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		}
 	}
 	
+	/**
+	 * Permet l'affichage des infos de jeu en fonction de l'état de la partie.
+	 * @param gl le contexte OpenGL.
+	 */
 	private void afficherInfo(GL gl)
 	{
 		if(!perdu)
@@ -616,6 +621,15 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 		}
 	}
 	
+	/**
+	 * Permet de mettre à jour l'affichage des infos de jeu.
+	 * @param score le score actuel du joueur.
+	 * @param combo le nombre de combos effectués.
+	 * @param difficulte le niveau de difficulté.
+	 * @param start indique si la partie est commencée.
+	 * @param pause indique si la partie est en pause.
+	 * @param perdu indique si la partie est perdue.
+	 */
 	public void chargerInfo(int score, int combo, int difficulte, boolean start, boolean pause, boolean perdu)
 	{
 		this.score = score;
