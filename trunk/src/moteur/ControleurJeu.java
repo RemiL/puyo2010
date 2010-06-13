@@ -2,8 +2,13 @@ package moteur;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeMap;
 
 import javax.media.opengl.GLCapabilities;
 
@@ -84,6 +89,9 @@ public class ControleurJeu extends KeyAdapter
 				{
 					zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), true);
 					timerChute.cancel();
+					
+					verifierMeilleursScores(partie.getScore());
+					
 					partie = new Partie();
 				}
 				else
@@ -139,7 +147,18 @@ public class ControleurJeu extends KeyAdapter
 	 */
 	public void keyPressed(KeyEvent e)
 	{
-		if (!partie.estEnCours())
+		if (e.getKeyCode() == KeyEvent.VK_F2 || e.getKeyCode() == KeyEvent.VK_M || e.getKeyCode() == KeyEvent.VK_H)
+		{
+			if (partie.estEnCours() && !partie.estEnPause())
+			{
+				timerChute.cancel();
+				partie.mettreEnPause();
+				zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(),partie.estEnPause(), false);
+			}
+			
+			fenetrePrincipale.afficheMeilleuresScores(chargerMeilleursScores());
+		}
+		else if (!partie.estEnCours() && e.getKeyCode() == KeyEvent.VK_ENTER)
 		{
 			if (e.getKeyCode() == KeyEvent.VK_ENTER) // Lancement de la partie
 			{
@@ -214,5 +233,48 @@ public class ControleurJeu extends KeyAdapter
 				break;
 			}
 		}
+	}
+	
+	private MeilleursScores chargerMeilleursScores()
+	{
+		MeilleursScores meilleursScores;
+		try
+		{
+			ObjectInputStream deserialise = new ObjectInputStream(new FileInputStream("PPMS.dat"));
+			meilleursScores = (MeilleursScores) deserialise.readObject();
+			deserialise.close();
+		} catch (Exception e)
+		{
+			meilleursScores = new MeilleursScores();
+		}
+		
+		return meilleursScores;
+	}
+	
+	private void enregistrerMeilleursScores(MeilleursScores meilleursScores)
+	{
+		try
+		{
+			ObjectOutputStream serialise = new ObjectOutputStream(new FileOutputStream("PPMS.dat"));
+			serialise.writeObject(meilleursScores);
+	        serialise.flush();
+	        serialise.close();
+		} catch (Exception e)
+		{
+			// On ne fait rien
+		}
+	}
+	
+	private void verifierMeilleursScores(int score)
+	{
+		MeilleursScores meilleursScores = chargerMeilleursScores();
+		
+		if (meilleursScores.size() < 10 || meilleursScores.firstKey() < score)
+		{
+			meilleursScores.ajout(score, fenetrePrincipale.demandeNom());
+			fenetrePrincipale.afficheMeilleuresScores(meilleursScores);
+		}
+		
+		enregistrerMeilleursScores(meilleursScores);
 	}
 }
