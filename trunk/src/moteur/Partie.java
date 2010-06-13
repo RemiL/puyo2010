@@ -1,9 +1,5 @@
 package moteur;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -139,39 +135,71 @@ public class Partie
 		return pause;
 	}
 	
+	/**
+	 * Permet d'incrémenter le compteur de combo d'une unité.
+	 */
 	public void  ajoutCombo()
 	{
 		combo++;
 	}
 	
+	/**
+	 * Permet de remettre à zéro le compteur de combo.
+	 */
 	public void resetCombo()
 	{
 		combo=0;
 	}
-
+	
+	/**
+	 * Permet d'ajouter le score en prenant en compteur le nombre
+	 * de combo effectué. Le nouveau score est calculé en ajoutant
+	 * à l'ancien score le score fourni multiplié par le nombre de
+	 * combos effectués.
+	 * Retourne vrai ou faux selon que l'ajout du score ait modifié
+	 * ou non le niveau de difficulté.
+	 * @param score2 le score à ajouter.
+	 * @return
+	 */
 	public boolean ajoutScore(int score2)
 	{
+		// Ajout du score
 		score += combo * score2;
 		
+		// Calcul du niveau de difficulté
 		int sauvDifficulte = difficulte;
 		difficulte = score / 1000;
-		
+		// On limite le niveau à 9.
 		if (difficulte > 9)
 			difficulte = 9;
 		
+		// On vérifie si le niveau a été modifié.
 		return (sauvDifficulte != difficulte);
 	}
 	
+	/**
+	 * Retourne le score actuel du joueur dans la partie.
+	 * @return le score actuel.
+	 */
 	public int getScore()
 	{
 		return score;
 	}
 	
+	/**
+	 * Retourne le dernier nombre de combos effectués.
+	 * @return le nombre de combos.
+	 */
 	public int getCombo()
 	{
 		return combo;
 	}
 	
+	/**
+	 * Retourne le niveau de difficulté actuel du jeu.
+	 * @return un entier entre 0 et 9 définissant le niveau 
+	 * de difficulté (du moins difficile au plus difficile).
+	 */
 	public int getDifficulte()
 	{
 		return difficulte;

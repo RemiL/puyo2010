@@ -3,7 +3,6 @@ package graphique;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.JFrame;
@@ -20,6 +19,14 @@ public class FenetrePrincipale extends JFrame
 {
 	private static final long serialVersionUID = 4690329553231316904L;
 	
+	/**
+	 * Crée une fenêtre de jeu avec le titre fourni, de taille width sur height
+	 * contenant la zone de jeu fournie.
+	 * @param title le titre de la fenêtre
+	 * @param width la largueur de la fenêtre.
+	 * @param height la hauteur de la fenêtre.
+	 * @param zdj la zone de jeu à placer dans la fenêtre.
+	 */
 	public FenetrePrincipale(String title, int width, int height, ZoneDeJeu zdj)
 	{
 		super(title);
@@ -35,7 +42,13 @@ public class FenetrePrincipale extends JFrame
 		
 		zdj.requestFocus();
 	}
-
+	
+	/**
+	 * Crée et affiche une boite de dialogue permettant de demander à l'utilisateur
+	 * son nom après qu'il ait fait un nouveau meilleur score.
+	 * Retourne la chaine entrée par l'utilisateur.
+	 * @return la chaine de caractères entrée par l'utilisateur, éventuellement vide.
+	 */
 	public String demandeNom()
 	{
 		String nom;
@@ -47,6 +60,11 @@ public class FenetrePrincipale extends JFrame
 		return nom;
 	}
 	
+	/**
+	 * Crée et affiche une boite de dialogue contenant la liste des meilleurs
+	 * scores passée en paramètre.
+	 * @param meilleursScores la liste des meilleurs scores à afficher.
+	 */
 	public void afficheMeilleuresScores(MeilleursScores meilleursScores)
 	{
 		StringBuilder msg = new StringBuilder();
