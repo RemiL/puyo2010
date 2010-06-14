@@ -187,12 +187,20 @@ public class ControleurJeu extends KeyAdapter
 				timerChute.schedule(new TimerChute(), 500, 500);
 			}
 		}
-		else if (partie.estEnCours() && e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
+		else if (partie.estEnCours() && e.getKeyCode() == KeyEvent.VK_BACK_SPACE) // Commencer une nouvelle partie
 		{
 			timerChute.cancel();
 			partie = new Partie();
 			zoneDeJeu.chargerPlateau((Plateau) partie.getPlateau().clone());
 			zoneDeJeu.chargerPiecesSuivantes(partie.getPiecesSuivantes());
+			zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), false);
+		}
+		else if (partie.estEnCours() && e.getKeyCode() == KeyEvent.VK_ADD) // Augmente la difficulté
+		{
+			partie.augmenterDifficulte();
+			timerChute.cancel();
+			timerChute = new Timer();
+			timerChute.schedule(new TimerChute(), 0, 500 - partie.getDifficulte()*50);
 			zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), false);
 		}
 		else if (partie.estEnPause() && e.getKeyCode() == KeyEvent.VK_PAUSE) // Reprise d'une partie mise en pause
