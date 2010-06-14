@@ -27,6 +27,8 @@ public class Partie
 	private boolean start;
 	/** Indique si la partie est mise en pause ou non */
 	private boolean pause;
+	/** Contient les valeurs de changement de difficulté */
+	private int[] changementsDifficulte;
 	
 	/**
 	 * Crée une nouvelle partie non commencée avec un plateau vide
@@ -44,6 +46,16 @@ public class Partie
 		
 		prochainesPieces.add(new Piece());
 		prochainesPieces.add(new Piece());
+		
+		// On crée le tableau contenant les valeurs de changement de difficulté
+		changementsDifficulte = new int[9];
+		for(int i=0; i<9; i++)
+		{
+			if(i > 0)
+				changementsDifficulte[i] = (int) (changementsDifficulte[i-1] + 1000 * (1 + (2 * (i-1)) / 10.0));
+			else
+				changementsDifficulte[i] = 1000;
+		}
 	}
 	
 	/**
@@ -164,14 +176,24 @@ public class Partie
 	public boolean ajoutScore(int score2)
 	{
 		// Ajout du score
-		score += combo * score2;
+		score += score2 * combo * (1+ difficulte/10.0);
 		
 		// Calcul du niveau de difficulté
 		int sauvDifficulte = difficulte;
-		difficulte = score / 1000;
+		
 		// On limite le niveau à 9.
-		if (difficulte > 9)
-			difficulte = 9;
+		if (difficulte < 9)
+		{
+			// On cherche la difficulté correspondant au score
+			for(int i=8; i>=difficulte; i--)
+			{
+				if(score >= changementsDifficulte[i])
+				{
+					difficulte = i+1;
+					break;
+				}
+			}
+		}
 		
 		// On vérifie si le niveau a été modifié.
 		return (sauvDifficulte != difficulte);
@@ -203,5 +225,11 @@ public class Partie
 	public int getDifficulte()
 	{
 		return difficulte;
+	}
+
+	public void augmenterDifficulte() 
+	{
+		if(difficulte < 9)
+			difficulte++;
 	}
 }
