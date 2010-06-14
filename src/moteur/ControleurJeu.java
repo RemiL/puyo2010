@@ -83,6 +83,8 @@ public class ControleurJeu extends KeyAdapter
 						attente(200);
 					}
 					partie.resetCombo(); // On remet le compteur de combo à 0.
+					// On met à jour le plateau et les infos de jeu.
+					zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), false);
 					zoneDeJeu.chargerPiecesSuivantes(partie.chargerPieceSuivante()); // On charge la pièce suivante
 				}
 				else if(ret == Plateau.PERDU) // Si on a perdu
