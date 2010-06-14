@@ -97,9 +97,10 @@ public class FenetrePrincipale extends JFrame
 		msg.append(" - Entrée : lance la partie.\n");
 		msg.append(" - Retour arrière : réinitialise la partie.\n");
 		msg.append(" - Pause : met la partie en pause ou reprend la partie mise en pause.\n");
+		msg.append(" - + : Augmente la difficulté.\n");
 		msg.append(" - Barre d'espace : accélère la chute de la pièce.\n");
 		msg.append(" - Flèches gauche / droite : déplace la pièce d'une case vers la gauche ou la droite.\n");
-		msg.append(" - Flèches haut / bas : effectue une rotation horaire / antihoraire de la pièce.");
+		msg.append(" - Flèches haut / bas : effectue une rotation antihoraire / horaire de la pièce.");
 		
 		JOptionPane.showMessageDialog(this, msg, "Aide", JOptionPane.INFORMATION_MESSAGE);
 	}
