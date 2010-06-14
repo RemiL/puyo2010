@@ -81,6 +81,26 @@ public class FenetrePrincipale extends JFrame
 		
 		msg.insert(0, "Meilleurs scores :\n\n");
 		
-		JOptionPane.showMessageDialog(this, msg.toString(), "Meilleurs scores", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(this, msg, "Meilleurs scores", JOptionPane.INFORMATION_MESSAGE);
+	}
+	
+	public void afficheAide()
+	{
+		StringBuilder msg = new StringBuilder("Règle du jeu :\n\nLe but du jeu est de former des blocs de 4 puyos ou plus, ");
+		msg.append("une fois formés ces blocs disparaissent de la zone de jeu\net rapportent des points. La partie est perdue ");
+		msg.append("si les puyos débordent de la zone de jeu par le haut de l'écran.\nLa difficulté du jeu augmente progressivement ");
+		msg.append("lorsque le score augmente, ce qui se traduit par une accélération\nde la chute des pièces.\n\n");
+		
+		msg.append("Commandes :\n\n");
+		msg.append(" - F1 : affiche ce message.\n");
+		msg.append(" - F2 ou h ou m : affiche les meilleurs scores enregistrés.\n");
+		msg.append(" - Entrée : lance la partie.\n");
+		msg.append(" - Retour arrière : réinitialise la partie.\n");
+		msg.append(" - Pause : met la partie en pause ou reprend la partie mise en pause.\n");
+		msg.append(" - Barre d'espace : accélère la chute de la pièce.\n");
+		msg.append(" - Flèches gauche / droite : déplace la pièce d'une case vers la gauche ou la droite.\n");
+		msg.append(" - Flèches haut / bas : effectue une rotation horaire / antihoraire de la pièce.");
+		
+		JOptionPane.showMessageDialog(this, msg, "Aide", JOptionPane.INFORMATION_MESSAGE);
 	}
 }

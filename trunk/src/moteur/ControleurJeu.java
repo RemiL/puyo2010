@@ -163,7 +163,18 @@ public class ControleurJeu extends KeyAdapter
 			
 			fenetrePrincipale.afficheMeilleuresScores(chargerMeilleursScores());
 		}
-		else if (!partie.estEnCours() && e.getKeyCode() == KeyEvent.VK_ENTER)
+		else if (e.getKeyCode() == KeyEvent.VK_F1) // Affichage de l'aide
+		{
+			if (partie.estEnCours() && !partie.estEnPause()) // On met la partie en pause si elle est en cours.
+			{
+				timerChute.cancel();
+				partie.mettreEnPause();
+				zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(),partie.estEnPause(), false);
+			}
+			
+			fenetrePrincipale.afficheAide();
+		}
+		else if (!partie.estEnCours())
 		{
 			if (e.getKeyCode() == KeyEvent.VK_ENTER) // Lancement de la partie
 			{
