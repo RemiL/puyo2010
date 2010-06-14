@@ -52,7 +52,7 @@ public class Partie
 		for(int i=0; i<9; i++)
 		{
 			if(i > 0)
-				changementsDifficulte[i] = (int) (changementsDifficulte[i-1] + 1000 * (1 + (2 * (i-1)) / 10.0));
+				changementsDifficulte[i] = (int) (changementsDifficulte[i-1] + 1000 * (1 + (2 * i) / 10.0));
 			else
 				changementsDifficulte[i] = 1000;
 		}
