@@ -47,15 +47,16 @@ public class FenetrePrincipale extends JFrame
 	 * Crée et affiche une boite de dialogue permettant de demander à l'utilisateur
 	 * son nom après qu'il ait fait un nouveau meilleur score.
 	 * Retourne la chaine entrée par l'utilisateur.
+	 * @param score le score du joueur
 	 * @return la chaine de caractères entrée par l'utilisateur, éventuellement vide.
 	 */
-	public String demandeNom()
+	public String demandeNom(int score)
 	{
 		String nom;
 		
-		do {
-			nom = JOptionPane.showInputDialog(this, "Félicitation, vous venez de faire un nouveau meilleur score !\nEntrez votre nom :", "Nouveau meilleur score", JOptionPane.QUESTION_MESSAGE);
-		} while (nom == null);
+		nom = JOptionPane.showInputDialog(this, "Félicitation, vous venez de faire un nouveau meilleur score ("+score+") !\nEntrez votre nom :", "Nouveau meilleur score", JOptionPane.QUESTION_MESSAGE);
+		if (nom == null) // L'utilisateur a fermé la fenêtre ...
+			nom = "";
 		
 		return nom;
 	}
@@ -65,25 +66,34 @@ public class FenetrePrincipale extends JFrame
 	 * scores passée en paramètre.
 	 * @param meilleursScores la liste des meilleurs scores à afficher.
 	 */
-	public void afficheMeilleuresScores(MeilleursScores meilleursScores)
+	public void afficheMeilleursScores(MeilleursScores meilleursScores)
 	{
 		StringBuilder msg = new StringBuilder();
 		int i = meilleursScores.size();
 		
-		for (Entry<Integer, LinkedList<String>> entree : meilleursScores.entrySet())
+		if (i != 0)
 		{
-			for (String nom : entree.getValue())
+			for (Entry<Integer, LinkedList<String>> entree : meilleursScores.entrySet())
 			{
-				msg.insert(0, i+") "+nom+" : "+entree.getKey()+"\n");
-				i--;
+				for (String nom : entree.getValue())
+				{
+					msg.insert(0, i+") "+nom+" : "+entree.getKey()+"\n");
+					i--;
+				}
 			}
 		}
+		else
+			msg.insert(0, "Aucun meilleur score enregistré pour le moment !");
 		
 		msg.insert(0, "Meilleurs scores :\n\n");
 		
 		JOptionPane.showMessageDialog(this, msg, "Meilleurs scores", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
+	/**
+	 * Crée et affiche une boite de dialogue contenant une aide succinct pour
+	 * le jeu avec la règle du jeu et les commandes à utiliser.
+	 */
 	public void afficheAide()
 	{
 		StringBuilder msg = new StringBuilder("Règle du jeu :\n\nLe but du jeu est de former des blocs de 4 puyos ou plus, ");
