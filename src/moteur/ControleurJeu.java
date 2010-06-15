@@ -163,7 +163,7 @@ public class ControleurJeu extends KeyAdapter
 				zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(),partie.estEnPause(), false);
 			}
 			
-			fenetrePrincipale.afficheMeilleuresScores(chargerMeilleursScores());
+			fenetrePrincipale.afficheMeilleursScores(chargerMeilleursScores());
 		}
 		else if (e.getKeyCode() == KeyEvent.VK_F1) // Affichage de l'aide
 		{
@@ -199,16 +199,18 @@ public class ControleurJeu extends KeyAdapter
 		}
 		else if (partie.estEnCours() && e.getKeyCode() == KeyEvent.VK_ADD) // Augmente la difficulté
 		{
-			partie.augmenterDifficulte();
-			timerChute.cancel();
-			timerChute = new Timer();
-			timerChute.schedule(new TimerChute(), 0, 500 - partie.getDifficulte()*50);
+			if (partie.augmenterDifficulte() && !partie.estEnPause())
+			{ // On ne change le timer que si la difficulté a été vraiment modifiée et si la partie n'est pas actuellement en pause
+				timerChute.cancel();
+				timerChute = new Timer();
+				timerChute.schedule(new TimerChute(), 0, 500 - partie.getDifficulte()*50);
+			}
 			zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), false);
 		}
 		else if (partie.estEnPause() && e.getKeyCode() == KeyEvent.VK_PAUSE) // Reprise d'une partie mise en pause
 		{
 			timerChute = new Timer();
-			timerChute.schedule(new TimerChute(), 0, 500);
+			timerChute.schedule(new TimerChute(), 0, 500 - partie.getDifficulte()*50);
 			partie.reprendrePartie();
 			zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), false);
 		}
@@ -318,9 +320,9 @@ public class ControleurJeu extends KeyAdapter
 		if (meilleursScores.size() < 10 || meilleursScores.firstKey() < score)
 		{
 			// On ajoute le nouveau meilleur score
-			meilleursScores.ajout(score, fenetrePrincipale.demandeNom());
+			meilleursScores.ajout(score, fenetrePrincipale.demandeNom(score));
 			// et on affiche la liste des meilleurs scores.
-			fenetrePrincipale.afficheMeilleuresScores(meilleursScores);
+			fenetrePrincipale.afficheMeilleursScores(meilleursScores);
 			
 			// On sauvegarde la liste modifiée.
 			enregistrerMeilleursScores(meilleursScores);

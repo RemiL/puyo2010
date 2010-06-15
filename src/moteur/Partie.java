@@ -49,12 +49,10 @@ public class Partie
 		
 		// On crée le tableau contenant les valeurs de changement de difficulté
 		changementsDifficulte = new int[9];
-		for(int i=0; i<9; i++)
+		changementsDifficulte[0] = 1000;
+		for (int i=1; i<9; i++)
 		{
-			if(i > 0)
-				changementsDifficulte[i] = (int) (changementsDifficulte[i-1] + 1000 * (1 + (2 * i) / 10.0));
-			else
-				changementsDifficulte[i] = 1000;
+			changementsDifficulte[i] = (int) (changementsDifficulte[i-1] + 1000 * (1 + (2 * i) / 10.0));
 		}
 	}
 	
@@ -167,7 +165,7 @@ public class Partie
 	 * Permet d'ajouter le score en prenant en compteur le nombre
 	 * de combo effectué. Le nouveau score est calculé en ajoutant
 	 * à l'ancien score le score fourni multiplié par le nombre de
-	 * combos effectués.
+	 * combos effectués et par un bonus dépendant de la difficulté.
 	 * Retourne vrai ou faux selon que l'ajout du score ait modifié
 	 * ou non le niveau de difficulté.
 	 * @param score2 le score à ajouter.
@@ -176,24 +174,14 @@ public class Partie
 	public boolean ajoutScore(int score2)
 	{
 		// Ajout du score
-		score += score2 * combo * (1+ difficulte/10.0);
+		score += score2 * combo * (1 + difficulte / 10.0);
 		
 		// Calcul du niveau de difficulté
 		int sauvDifficulte = difficulte;
 		
-		// On limite le niveau à 9.
-		if (difficulte < 9)
-		{
-			// On cherche la difficulté correspondant au score
-			for(int i=8; i>=difficulte; i--)
-			{
-				if(score >= changementsDifficulte[i])
-				{
-					difficulte = i+1;
-					break;
-				}
-			}
-		}
+		// On cherche la difficulté correspondant au score en limitant le niveau à 9.
+		while (difficulte < 9 && changementsDifficulte[difficulte] <= score)
+			difficulte++;
 		
 		// On vérifie si le niveau a été modifié.
 		return (sauvDifficulte != difficulte);
@@ -226,10 +214,23 @@ public class Partie
 	{
 		return difficulte;
 	}
-
-	public void augmenterDifficulte() 
+	
+	/**
+	 * Permet d'augmenter le niveau de difficulté du jeu. Si
+	 * le niveau maximum avait déjà été précédemment atteint
+	 * l'appel de cette méthode n'a pas d'effet et elle retourne
+	 * faux sinon elle retourne vrai.
+	 * @return un booleen indiquant si la difficulté a été réellement
+	 * modifiée ou non.
+	 */
+	public boolean augmenterDifficulte() 
 	{
-		if(difficulte < 9)
+		if (difficulte < 9)
+		{
 			difficulte++;
+			return true;
+		}
+		else
+			return false;
 	}
 }
