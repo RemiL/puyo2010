@@ -209,7 +209,7 @@ public class ControleurJeu extends KeyAdapter
 			zoneDeJeu.chargerPiecesSuivantes(partie.getPiecesSuivantes());
 			zoneDeJeu.chargerInfo(partie.getScore(), partie.getCombo(), partie.getDifficulte(), partie.estEnCours(), partie.estEnPause(), false);
 		}
-		else if (partie.estEnCours() && (e.getKeyCode() == KeyEvent.VK_ADD || e.getKeyCode() == KeyEvent.VK_PLUS)) // Augmente la difficulté
+		else if (partie.estEnCours() && (e.getKeyCode() == KeyEvent.VK_ADD || e.getKeyCode() == KeyEvent.VK_PLUS || (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_EQUALS))) // Augmente la difficulté
 		{
 			if (partie.augmenterDifficulte() && !partie.estEnPause())
 			{ // On ne change le timer que si la difficulté a été vraiment modifiée et si la partie n'est pas actuellement en pause
