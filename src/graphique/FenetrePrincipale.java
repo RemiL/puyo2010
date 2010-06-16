@@ -102,6 +102,7 @@ public class FenetrePrincipale extends JFrame
 		msg.append("lorsque le score augmente, ce qui se traduit par une accélération\nde la chute des pièces.\n\n");
 		
 		msg.append("Commandes :\n\n");
+		msg.append(" - Echap : quitte le jeu.\n");
 		msg.append(" - F1 : affiche ce message.\n");
 		msg.append(" - F2 ou h ou m : affiche les meilleurs scores enregistrés.\n");
 		msg.append(" - Entrée : lance la partie.\n");
