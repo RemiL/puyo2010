@@ -161,7 +161,12 @@ public class ControleurJeu extends KeyAdapter
 	 */
 	public void keyPressed(KeyEvent e)
 	{
-		if (e.getKeyCode() == KeyEvent.VK_F2 || e.getKeyCode() == KeyEvent.VK_M || e.getKeyCode() == KeyEvent.VK_H) // Affichage des meilleurs scores
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) // On quitte l'application
+		{
+			fenetrePrincipale.dispose();
+			System.exit(0);
+		}
+		else if (e.getKeyCode() == KeyEvent.VK_F2 || e.getKeyCode() == KeyEvent.VK_M || e.getKeyCode() == KeyEvent.VK_H) // Affichage des meilleurs scores
 		{
 			if (partie.estEnCours() && !partie.estEnPause()) // On met la partie en pause si elle est en cours.
 			{
