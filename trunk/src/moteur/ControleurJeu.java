@@ -42,9 +42,14 @@ public class ControleurJeu extends KeyAdapter
 	 */
 	private class TimerChute extends TimerTask
 	{
-		int score;
-		int ret;
+		/** Le score rapporté par une étape de destruction de blocs */
+		private int score;
+		/** Le code de retour correspondant à l'opération de translation */
+		private int ret;
 		
+		/**
+		 * Crée un nouveau timer non lancé.
+		 */
 		public TimerChute()
 		{
 			super();
@@ -52,7 +57,9 @@ public class ControleurJeu extends KeyAdapter
 		
 		/**
 		 * Méthode lançée par le timer après chaque période d'attente
-		 * pour faire descendre la pièce d'une case.
+		 * pour faire descendre la pièce d'une case et effectuée le
+		 * cycle de vérification permettant la détection de la défaite
+		 * et des blocs à détruire.
 		 */
 		public void run()
 		{

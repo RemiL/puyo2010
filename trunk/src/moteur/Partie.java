@@ -169,7 +169,8 @@ public class Partie
 	 * Retourne vrai ou faux selon que l'ajout du score ait modifié
 	 * ou non le niveau de difficulté.
 	 * @param score2 le score à ajouter.
-	 * @return
+	 * @return un boolean indiquant si l'ajout du score a modifié
+	 * le niveau de difficulté.
 	 */
 	public boolean ajoutScore(int score2)
 	{

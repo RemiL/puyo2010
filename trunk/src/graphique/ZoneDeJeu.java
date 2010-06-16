@@ -416,10 +416,12 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 							couleur = plateau.getCouleurPuyo(i, j);
 							
 							gl.glPushMatrix();
+								// Affichage du puyo
 								gl.glColor3f(couleur.getRed()/255, couleur.getGreen()/255, couleur.getBlue()/255);
 								gl.glTranslated(cx, cy, 0);
 								gl.glCallList(listePuyo);
-							
+								
+								// Affichage des liens
 								if(plateau.getPuyo(i, j).getLien(Puyo.HAUT))
 								{
 									gl.glPushMatrix();
@@ -432,7 +434,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 								{
 									gl.glPushMatrix();
 										gl.glTranslated(35/2, 0, 0);
-										gl.glScaled(1, 0.6, 1);
+										gl.glScaled(1, 0.5, 1);
 										gl.glCallList(listePuyo);
 									gl.glPopMatrix();
 								}
@@ -481,6 +483,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 					gl.glPushMatrix();
 						if (piece.getForme() != Piece.COUDE)
 							gl.glTranslated(18, 0, 0);
+						// Affichage des puyos composant la pièce
 						for (Map.Entry<Puyo, Point> paire : piece.entrySet())
 						{
 							couleur = paire.getKey().getCouleur();
@@ -575,6 +578,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 				}
 			gl.glPopMatrix();
 			
+			// Affichage du symbole donnant l'état du jeu
 			if(pause)
 			{
 				gl.glPushMatrix();
@@ -591,7 +595,7 @@ public class ZoneDeJeu extends GLCanvas implements GLEventListener
 			}
 				
 		}
-		else
+		else // L'utilisateur a perdu la partie
 		{
 			gl.glPushMatrix();
 				gl.glCallList(listePerdu);
